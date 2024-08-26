@@ -29,7 +29,7 @@
 	</scm>
 	<properties>
 		<java.version>22</java.version>
-		<org.mapstruct.version>1.2.0.final</org.mapstruct.version>
+		<org.mapstruct.version>1.6.0</org.mapstruct.version>
 		<org.projectlombok.version>1.18.34</org.projectlombok.version>
 	</properties>
 	<dependencies>
@@ -61,7 +61,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mapstruct</groupId>
-			<artifactId>mapstruct-jdk8</artifactId>
+			<artifactId>mapstruct</artifactId>
 			<version>${org.mapstruct.version}</version>
 		</dependency>
 		<dependency>
