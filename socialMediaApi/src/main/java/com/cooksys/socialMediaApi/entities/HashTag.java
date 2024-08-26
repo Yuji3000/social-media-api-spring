@@ -27,6 +27,7 @@ public class HashTag {
 	@Column(unique = true, nullable = false)
 	private String label;
 
+
 	@ManyToMany
 	@JoinTable(name = "tweet_hashtags", joinColumns = @JoinColumn(name = "hashtag_id"), inverseJoinColumns = @JoinColumn(name = "tweet_id"))
 	private List<HashTag> hashtags;
@@ -46,4 +47,8 @@ public class HashTag {
 	protected void onUpdate() {
 		this.lastUsed = new Timestamp(System.currentTimeMillis());
 	}
+
 }
+
+
+
