@@ -50,10 +50,10 @@ public class Tweet {
 	@JoinTable(name = "tweet_hashtags", joinColumns = @JoinColumn(name = "tweet_id"), inverseJoinColumns = @JoinColumn(name = "hashtag_id"))
 	private List<Hashtag> hashtags;
 
-	@OneToMany(mappedBy = "in_reply_to")
+	@OneToMany(mappedBy = "inReplyTo")
 	private List<Tweet> replies;
 
-	@OneToMany(mappedBy = "repost_of")
+	@OneToMany(mappedBy = "repostOf")
 	private List<Tweet> reposts;
 
 	@ManyToMany
