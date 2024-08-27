@@ -8,7 +8,7 @@ import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.entities.Tweet;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface TweetMapper {
 
 	TweetResponseDto entityToDto(Tweet entity);

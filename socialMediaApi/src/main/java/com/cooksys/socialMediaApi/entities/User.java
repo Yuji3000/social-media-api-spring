@@ -3,6 +3,8 @@ package com.cooksys.socialMediaApi.entities;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -27,35 +29,32 @@ public class User {
 	@GeneratedValue
 	private Long id;
 
+	@CreationTimestamp
 	@Column(nullable = false)
 	private Timestamp joined;
 
-	@Column(nullable = false)
-	private Boolean deleted = false;
+	private boolean deleted = false;
 
 	@ManyToMany
-	@JoinTable(name = "followers_following", joinColumns = @JoinColumn(name = "follower_id"), inverseJoinColumns = @JoinColumn(name = "following_id"))
+	@JoinTable(name = "followers_following")
 	private List<User> following;
 
 	@ManyToMany(mappedBy = "following")
 	private List<User> followers;
 
 	@ManyToMany
-	@JoinTable(name = "user_likes", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "tweet_id"))
-	private List<Tweet> likedTweets;
+    @JoinTable(
+            name = "user_likes",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "tweet_id")
+    )
+    private List<Tweet> likedTweets;
 
-	@ManyToMany
-	@JoinTable(name = "user_mentions", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "tweet_id"))
-	private List<Tweet> mentionedInTweets;
+	@ManyToMany(mappedBy = "mentionedUsers")
+    private List<Tweet> mentionedTweets;
 
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "author")
 	private List<Tweet> tweets;
-
-	@PrePersist
-	protected void onCreate() {
-		Timestamp now = new Timestamp(System.currentTimeMillis());
-		this.joined = now;
-	}
 	
 	@Embedded
 	private Profile profile;

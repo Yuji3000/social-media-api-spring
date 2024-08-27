@@ -3,6 +3,8 @@ package com.cooksys.socialMediaApi.entities;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,28 +28,27 @@ public class Tweet {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "author")
-	private User user;
+	private User author;
 
-	@Column(nullable = false)
+	@CreationTimestamp
 	private Timestamp posted;
 
-	@Column(nullable = false)
-	private Boolean deleted = false;
+	private boolean deleted = false;
 
-	@Column(nullable = true)
 	private String content;
 
 	@ManyToOne
-	@JoinColumn(name = "in_reply_to")
 	private Tweet inReplyTo;
 
 	@ManyToOne
-	@JoinColumn(name = "repost_of")
 	private Tweet repostOf;
 
 	@ManyToMany
-	@JoinTable(name = "tweet_hashtags", joinColumns = @JoinColumn(name = "tweet_id"), inverseJoinColumns = @JoinColumn(name = "hashtag_id"))
+	@JoinTable(
+			name = "tweet_hashtags", 
+			joinColumns = @JoinColumn(name = "tweet_id"), 
+			inverseJoinColumns = @JoinColumn(name = "hashtag_id")
+			)
 	private List<Hashtag> hashtags;
 
 	@OneToMany(mappedBy = "inReplyTo")
@@ -57,11 +58,12 @@ public class Tweet {
 	private List<Tweet> reposts;
 
 	@ManyToMany
-	@JoinTable(name = "user_mentions", joinColumns = @JoinColumn(name = "tweet_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-	private List<Tweet> mentions;
+	@JoinTable(
+			name = "user_mentions", 
+			joinColumns = @JoinColumn(name = "tweet_id"), 
+			inverseJoinColumns = @JoinColumn(name = "user_id"))
+	private List<User> mentionedUsers;
 
-	@PrePersist
-	protected void onCreate() {
-		this.posted = new Timestamp(System.currentTimeMillis());
-	}
+	@ManyToMany(mappedBy = "likedTweets")
+    private List<User> likedByUsers;
 }
