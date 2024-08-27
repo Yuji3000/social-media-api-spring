@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseBody
 public class DefaultControllerAdvice {
 
-    // TODO: Add ErrorDto import
-
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BadRequestException.class)
     public ErrorDto handleBadRequestException(HttpServletRequest request, BadRequestException badRequestException) {
