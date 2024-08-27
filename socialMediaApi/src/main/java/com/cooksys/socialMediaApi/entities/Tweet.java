@@ -39,21 +39,21 @@ public class Tweet {
 	private String content;
 
 	@ManyToOne
-	@JoinColumn(name = "inReplyTo")
+	@JoinColumn(name = "in_reply_to")
 	private Tweet inReplyTo;
 
-	@Column
-	@JoinColumn(name = "repostOf")
+	@ManyToOne
+	@JoinColumn(name = "repost_of")
 	private Tweet repostOf;
 
 	@ManyToMany
 	@JoinTable(name = "tweet_hashtags", joinColumns = @JoinColumn(name = "tweet_id"), inverseJoinColumns = @JoinColumn(name = "hashtag_id"))
 	private List<Hashtag> hashtags;
 
-	@OneToMany(mappedBy = "inReplyTo")
+	@OneToMany(mappedBy = "in_reply_to")
 	private List<Tweet> replies;
 
-	@OneToMany(mappedBy = "repostOf")
+	@OneToMany(mappedBy = "repost_of")
 	private List<Tweet> reposts;
 
 	@ManyToMany
