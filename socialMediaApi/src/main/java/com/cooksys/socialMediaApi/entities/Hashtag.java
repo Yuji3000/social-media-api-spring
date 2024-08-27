@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Data
-public class HashTag {
+public class Hashtag {
 
 	@Id
 	@GeneratedValue
@@ -27,28 +27,26 @@ public class HashTag {
 	@Column(unique = true, nullable = false)
 	private String label;
 
-
 	@ManyToMany
 	@JoinTable(name = "tweet_hashtags", joinColumns = @JoinColumn(name = "hashtag_id"), inverseJoinColumns = @JoinColumn(name = "tweet_id"))
-	private List<HashTag> hashtags;
+	private List<Hashtag> hashtags;
 
-	private Timestamp firstUsed;
+	@Column(nullable = false)
+	private Timestamp firstused;
 
-	private Timestamp lastUsed;
+	@Column(nullable = false)
+	private Timestamp lastused;
 
 	@PrePersist
 	protected void onCreate() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
-		this.firstUsed = now;
-		this.lastUsed = now;
+		this.firstused = now;
+		this.lastused = now;
 	}
 
 	@PreUpdate
 	protected void onUpdate() {
-		this.lastUsed = new Timestamp(System.currentTimeMillis());
+		this.lastused = new Timestamp(System.currentTimeMillis());
 	}
 
 }
-
-
-
