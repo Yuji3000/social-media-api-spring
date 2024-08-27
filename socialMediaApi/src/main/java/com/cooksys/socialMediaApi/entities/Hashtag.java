@@ -3,15 +3,15 @@ package com.cooksys.socialMediaApi.entities;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,26 +27,13 @@ public class Hashtag {
 	@Column(unique = true, nullable = false)
 	private String label;
 
-	@ManyToMany
-	@JoinTable(name = "tweet_hashtags", joinColumns = @JoinColumn(name = "hashtag_id"), inverseJoinColumns = @JoinColumn(name = "tweet_id"))
-	private List<Hashtag> hashtags;
+	@ManyToMany(mappedBy="hashtags", cascade=CascadeType.ALL)
+	private List<Tweet> tweets;
 
-	@Column(nullable = false)
+	@CreationTimestamp
 	private Timestamp firstUsed;
 
-	@Column(nullable = false)
+	@UpdateTimestamp
 	private Timestamp lastUsed;
-
-	@PrePersist
-	protected void onCreate() {
-		Timestamp now = new Timestamp(System.currentTimeMillis());
-		this.firstUsed = now;
-		this.lastUsed = now;
-	}
-
-	@PreUpdate
-	protected void onUpdate() {
-		this.lastUsed = new Timestamp(System.currentTimeMillis());
-	}
 
 }
