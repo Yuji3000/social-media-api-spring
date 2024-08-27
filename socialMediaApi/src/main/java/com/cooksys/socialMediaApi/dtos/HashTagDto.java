@@ -11,8 +11,6 @@ public class HashTagDto {
 
     private String label;
 
-    private List<tweetHashTagDto> tweetHashTags;
-
     private Timestamp firstUsed;
 
     private Timestamp lastUsed;
