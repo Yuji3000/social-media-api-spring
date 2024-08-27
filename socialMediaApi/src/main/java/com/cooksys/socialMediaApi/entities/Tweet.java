@@ -21,52 +21,47 @@ import lombok.NoArgsConstructor;
 @Data
 public class Tweet {
 
-    @Id
-    @GeneratedValue
-    private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "author")
-    private User user;
+	@ManyToOne
+	@JoinColumn(name = "author")
+	private User user;
 
-    @Column(nullable = false)
-    private Timestamp posted;
+	@Column(nullable = false)
+	private Timestamp posted;
 
-    @Column(nullable = false)
-    private Boolean deleted = false;
+	@Column(nullable = false)
+	private Boolean deleted = false;
 
-    @Column(nullable = true)
-    private String content;
+	@Column(nullable = true)
+	private String content;
 
- 
-    private Long inreplyto;
+	@ManyToOne
+	@JoinColumn(name = "inReplyTo")
+	private Tweet inReplyTo;
 
+	@Column
+	@JoinColumn(name = "repostOf")
+	private Tweet repostOf;
 
-    private Long repostof;
+	@ManyToMany
+	@JoinTable(name = "tweet_hashtags", joinColumns = @JoinColumn(name = "tweet_id"), inverseJoinColumns = @JoinColumn(name = "hashtag_id"))
+	private List<Hashtag> hashtags;
 
-    @ManyToMany
-    @JoinTable(
-        name = "tweet_hashtags",
-        joinColumns = @JoinColumn(name = "tweet_id"),
-        inverseJoinColumns = @JoinColumn(name = "hashtag_id")
-    )
-    private List<Hashtag> hashtags;
+	@OneToMany(mappedBy = "inReplyTo")
+	private List<Tweet> replies;
 
-    @OneToMany(mappedBy = "inreplyto")
-    private List<Tweet> replies;
+	@OneToMany(mappedBy = "repostOf")
+	private List<Tweet> reposts;
 
-    @OneToMany(mappedBy = "repostof")
-    private List<Tweet> reposts;
+	@ManyToMany
+	@JoinTable(name = "user_mentions", joinColumns = @JoinColumn(name = "tweet_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+	private List<Tweet> mentions;
 
-    @ManyToMany
-    @JoinTable(
-        name = "user_mentions",
-        joinColumns = @JoinColumn(name = "tweet_id"),
-        inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-
-    @PrePersist
-    protected void onCreate() {
-        this.posted = new Timestamp(System.currentTimeMillis());
-    }
+	@PrePersist
+	protected void onCreate() {
+		this.posted = new Timestamp(System.currentTimeMillis());
+	}
 }
