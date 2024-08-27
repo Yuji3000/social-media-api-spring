@@ -7,16 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class UserRequestDto {
 
-    private String username;
+    private CredentialsDto credentials;
 
-    private String password;
-
-    private String firstName;
-
-    private String lastName;
-
-    private String email;
-
-    private String phone;
+    private ProfileDto profile;
 
 }
