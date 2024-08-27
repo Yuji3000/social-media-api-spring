@@ -29,29 +29,11 @@ public class User {
 	@GeneratedValue
 	private Long id;
 
-	@Column(unique = true, nullable = false)
-	private String username;
-
-	@Column(nullable = false)
-	private String password;
-
 	@Column(nullable = false)
 	private Timestamp joined;
 
 	@Column(nullable = false)
 	private Boolean deleted = false;
-
-	@Column(nullable = false)
-	private String firstName;
-
-	@Column(nullable = false)
-	private String lastName;
-
-	@Column(nullable = false)
-	private String email;
-
-	@Column(nullable = false)
-	private String phone;
 
 	@ManyToMany
 	@JoinTable(name = "followers_following", joinColumns = @JoinColumn(name = "follower_id"), inverseJoinColumns = @JoinColumn(name = "following_id"))
@@ -78,12 +60,8 @@ public class User {
 	}
 	
 	@Embedded
-	@AttributeOverrides({
-			@AttributeOverride(name = "firstname", column = @Column(name = "profile_firstname")),
-			@AttributeOverride(name = "lastname", column = @Column(name = "profile_lastname")),
-			@AttributeOverride(name = "phone", column = @Column(name = "profile_phone")),
-			@AttributeOverride(name = "email", column = @Column(name = "profile_email"))})
-	
 	private Profile profile;
 
+	@Embedded
+	private Credentials credentials;
 }
