@@ -35,18 +35,6 @@ public class User {
 	@Column(nullable = false)
 	private Boolean deleted = false;
 
-	@Column(nullable = false)
-	private String firstName;
-
-	@Column(nullable = false)
-	private String lastName;
-
-	@Column(nullable = false)
-	private String email;
-
-	@Column(nullable = false)
-	private String phone;
-
 	@ManyToMany
 	@JoinTable(name = "followers_following", joinColumns = @JoinColumn(name = "follower_id"), inverseJoinColumns = @JoinColumn(name = "following_id"))
 	private List<User> following;
@@ -70,6 +58,9 @@ public class User {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 		this.joined = now;
 	}
+	
+	@Embedded
+	private Profile profile;
 
 	@Embedded
 	private Credentials credentials;
