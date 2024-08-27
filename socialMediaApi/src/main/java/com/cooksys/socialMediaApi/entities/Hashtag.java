@@ -32,21 +32,21 @@ public class Hashtag {
 	private List<Hashtag> hashtags;
 
 	@Column(nullable = false)
-	private Timestamp firstused;
+	private Timestamp firstUsed;
 
 	@Column(nullable = false)
-	private Timestamp lastused;
+	private Timestamp lastUsed;
 
 	@PrePersist
 	protected void onCreate() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
-		this.firstused = now;
-		this.lastused = now;
+		this.firstUsed = now;
+		this.lastUsed = now;
 	}
 
 	@PreUpdate
 	protected void onUpdate() {
-		this.lastused = new Timestamp(System.currentTimeMillis());
+		this.lastUsed = new Timestamp(System.currentTimeMillis());
 	}
 
 }

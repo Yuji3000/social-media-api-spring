@@ -8,9 +8,9 @@ import lombok.Data;
 @Data
 public class Profile {
 
-	private String firstname;
+	private String firstName;
 
-	private String lastname;
+	private String lastName;
 
 	@Column(nullable = false)
 	private String email;
