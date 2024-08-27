@@ -27,7 +27,7 @@ public class User {
 	
 	private String username;
 	
-	private String passWord;
+	private String password;
 	
 	private Timestamp joined;
 	
