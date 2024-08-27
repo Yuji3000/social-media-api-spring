@@ -1,5 +1,6 @@
 package com.cooksys.socialMediaApi.controllers.advice;
 
+import com.cooksys.socialMediaApi.dtos.ErrorDto;
 import com.cooksys.socialMediaApi.exceptions.BadRequestException;
 import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
