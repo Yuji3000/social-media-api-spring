@@ -1,0 +1,427 @@
+{
+  "info": {
+    "_postman_id": "615c0458-b4a4-4a8f-a932-007e4c5119e4",
+    "name": "Assessment 1 Test Suite",
+    "description": "Collection of endpoints to test the APIs the students create for their second assessment.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Get Empty Users",
+          "item": [
+            {
+              "name": "Get All Users Empty",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const userSchema = pm.environment.get('userSchema')",
+                      "",
+                      "const schema = {",
+                      "    type: 'array',",
+                      "    description: 'An array of user dto\\'s',",
+                      "    items: { $ref: userSchema }",
+                      "}",
+                      "",
+                      "pm.test('Schema is valid', () => {",
+                      "  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true",
+                      "})",
+                      "",
+                      "pm.test('Returns an empty array', () => {",
+                      "    pm.expect(pm.response.json().length).to.eql(0)",
+                      "})"
+                    ],
+                    "type": "text/javascript",
+                    "id": "a77093d9-612e-4fff-9a37-3b9df6016d59"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "localhost:8080/users",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "users"
+                  ]
+                },
+                "description": "Initially no users have been created so this method should return an empty array.\n\nStatus Expected: success\nExpected Response: [ ] (an empty array)"
+              },
+              "response": []
+            },
+            {
+              "name": "Get NonExisting User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status error', () => {",
+                      "    pm.response.to.not.be.success",
+                      "    pm.response.to.not.be.info",
+                      "})",
+                      "",
+                      "pm.test('Should not be an internal server error', () => {",
+                      "    pm.response.to.not.be.serverError",
+                      "})"
+                    ],
+                    "id": "9d5f923d-a19d-43bf-9265-2998a91ecc0b"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "localhost:8080/users/@doesNotExist",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "users",
+                    "@doesNotExist"
+                  ]
+                },
+                "description": "Attempts to get a user that doesn't exist in the database (at this point in testing). Should return an error code with no response body.\n\nExpected Status: error (400s && 500s) (Preferably a 404 Not Found!)\nExpected Body: none"
+              },
+              "response": []
+            }
+          ],
+          "description": "Test getter endpoints before actually creating any users.",
+          "protocolProfileBehavior": {},
+          "_postman_isSubFolder": true
+        }
+      ],
+      "protocolProfileBehavior": {}
+    },
+
+    {
+      "name": "Tweet",
+      "item": [
+        {
+          "name": "Get Tweets",
+          "item": [
+            {
+              "name": "Get All Tweets",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "1ac03292-ba37-432f-be59-0bfe8e44ebb7",
+                    "exec": [
+                      "const tweetSchema = pm.environment.get('tweetSchema')",
+                      "",
+                      "const schema = {",
+                      "    type: 'array',",
+                      "    description: 'An array of tweet dto\\'s',",
+                      "    items: { $ref: tweetSchema }",
+                      "}",
+                      "",
+                      "pm.test('Status success', () => {",
+                      "    pm.response.to.be.success",
+                      "})",
+                      "",
+                      "pm.test('Schema is valid', () => {",
+                      "  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true",
+                      "})",
+                      "",
+                      "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.json() !== null && Array.isArray(pm.response.json())) {",
+                      "    const content = pm.response.json().map(tweet => tweet.content)",
+                      "    const authors = pm.response.json().map(tweet => tweet.author.username)",
+                      "    ",
+                      "    pm.test('Contains the firstUser\\'s tweet', () => {",
+                      "        pm.expect(content).to.include(`Tweet from the first user! @${pm.environment.get('secondUser')} #${pm.environment.get('firstTag')}`)",
+                      "        pm.expect(authors).to.include(pm.environment.get('firstUser'))",
+                      "    })",
+                      "    ",
+                      "    pm.test('Contains the secondUser\\'s tweet', () => {",
+                      "        pm.expect(content).to.include(`Tweet from the second user! @${pm.environment.get('firstUser')} #${pm.environment.get('secondTag')}`)",
+                      "        pm.expect(authors).to.include(pm.environment.get('secondUser'))",
+                      "    })",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "localhost:8080/tweets",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "tweets"
+                  ]
+                },
+                "description": "Retrieves all (non-deleted) tweets. The tweets should appear in reverse-chronological order.\n\nResponse:\n[\n  {\n    \"id\": {id},\n    \"content\": \"{content}\",\n    \"posted\": {postedDate}\n    \"author\": {\n      \"username\": \"{username}\",\n      \"joined\": {joinedDate},\n      \"profile\": {\n        \"email\": \"{email}\",\n        \"firstName\": \"{firstname}\",\n        \"lastName\": \"{lastname}\",\n        \"phone\": \"{phoneNumber}\"\n      }\n    }\n  }\n]"
+              },
+              "response": []
+            },
+            {
+              "name": "Get FirstTweet",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const schema = pm.environment.get('tweetSchema')",
+                      "",
+                      "pm.test('Status success', () => {",
+                      "    pm.response.to.be.success",
+                      "})",
+                      "",
+                      "pm.test('Schema is valid', () => {",
+                      "  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true",
+                      "})",
+                      "",
+                      "pm.test('Author should be the firstUser', () => {",
+                      "    pm.expect(pm.response.json().author.username).to.eql(pm.environment.get('firstUser'))",
+                      "})",
+                      "",
+                      "pm.test('Content should be the firstTweet', () => {",
+                      "     pm.expect(pm.response.json().content).to.eql(`Tweet from the first user! @${pm.environment.get('secondUser')} #${pm.environment.get('firstTag')}`)",
+                      "})"
+                    ],
+                    "type": "text/javascript",
+                    "id": "58a6ba91-379f-470d-8999-4997bc51ea8b"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "localhost:8080/tweets/{{firstTweetId}}",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "tweets",
+                    "{{firstTweetId}}"
+                  ]
+                },
+                "description": "Retrieves a tweet with a given id. If no such tweet exists, or the given tweet is deleted, an error should be sent in lieu of a response.\n\nResponse:\n{\n  \"id\": {id},\n  \"content\": \"{content}\",\n  \"posted\": {postedDate}\n  \"author\": {\n    \"username\": \"{username}\",\n    \"joined\": {joinedDate},\n    \"profile\": {\n      \"email\": \"{email}\",\n      \"firstName\": \"{firstname}\",\n      \"lastName\": \"{lastname}\",\n      \"phone\": \"{phoneNumber}\"\n    }\n  }\n}"
+              },
+              "response": []
+            },
+            {
+              "name": "Get SecondTweet",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const schema = pm.environment.get('tweetSchema')",
+                      "",
+                      "pm.test('Status success', () => {",
+                      "    pm.response.to.be.success",
+                      "})",
+                      "",
+                      "pm.test('Schema is valid', () => {",
+                      "  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true",
+                      "})",
+                      "",
+                      "pm.test('Author should be the secondUser', () => {",
+                      "    pm.expect(pm.response.json().author.username).to.eql(pm.environment.get('secondUser'))",
+                      "})",
+                      "",
+                      "pm.test('Content should be the secondTweet', () => {",
+                      "     pm.expect(pm.response.json().content).to.eql(`Tweet from the second user! @${pm.environment.get('firstUser')} #${pm.environment.get('secondTag')}`)",
+                      "})"
+                    ],
+                    "type": "text/javascript",
+                    "id": "6f92a92c-dd74-42f3-b7fe-dc704359fb65"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "localhost:8080/tweets/{{secondTweetId}}",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "tweets",
+                    "{{secondTweetId}}"
+                  ]
+                },
+                "description": "Retrieves a tweet with a given id. If no such tweet exists, or the given tweet is deleted, an error should be sent in lieu of a response.\n\nResponse:\n{\n  \"id\": {id},\n  \"content\": \"{content}\",\n  \"posted\": {postedDate}\n  \"author\": {\n    \"username\": \"{username}\",\n    \"joined\": {joinedDate},\n    \"profile\": {\n      \"email\": \"{email}\",\n      \"firstName\": \"{firstname}\",\n      \"lastName\": \"{lastname}\",\n      \"phone\": \"{phoneNumber}\"\n    }\n  }\n}"
+              },
+              "response": []
+            },
+            {
+              "name": "Get FirstTag",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "09ed13c9-9a80-42b0-a9f5-6ae72f3f9a7a",
+                    "exec": [
+                      "const tweetSchema = pm.environment.get('tweetSchema')",
+                      "",
+                      "const schema = {",
+                      "    type: 'array',",
+                      "    description: 'An array of tweet dto\\'s',",
+                      "    items: { $ref: tweetSchema }",
+                      "}",
+                      "",
+                      "pm.test('Status success', () => {",
+                      "    pm.response.to.be.success",
+                      "})",
+                      "",
+                      "pm.test('Schema is valid', () => {",
+                      "  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true",
+                      "})",
+                      "",
+                      "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.json() !== null && Array.isArray(pm.response.json())) {",
+                      "    const content = pm.response.json().map(tweet => tweet.content)",
+                      "    const authors = pm.response.json().map(tweet => tweet.author.username)",
+                      "    ",
+                      "    pm.test('Should only contain the first user\\'s tweets', () => {",
+                      "        pm.expect(authors).to.include(pm.environment.get('firstUser'))",
+                      "        pm.expect(authors).to.not.include(pm.environment.get('secondUser'))",
+                      "    })",
+                      "    ",
+                      "    pm.test('Contains the firstUser\\'s tweet', () => {",
+                      "        pm.expect(content).to.include(`Tweet from the first user! @${pm.environment.get('secondUser')} #${pm.environment.get('firstTag')}`)",
+                      "        pm.expect(authors).to.include(pm.environment.get('firstUser'))",
+                      "    })",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "localhost:8080/tags/{{firstTag}}",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "tags",
+                    "{{firstTag}}"
+                  ]
+                },
+                "description": "Retrieves all (non-deleted) tweets tagged with the given hashtag label. The tweets should appear in reverse-chronological order. If no hashtag with the given label exists, an error should be sent in lieu of a response.\n\nA tweet is considered \"tagged\" by a hashtag if the tweet has content and the hashtag's label appears in that content following a #.\n\nResponse:\n[\n  {\n    \"id\": {id},\n    \"content\": \"{content}\",\n    \"posted\": {postedDate}\n    \"author\": {\n      \"username\": \"{username}\",\n      \"joined\": {joinedDate},\n      \"profile\": {\n        \"email\": \"{email}\",\n        \"firstName\": \"{firstname}\",\n        \"lastName\": \"{lastname}\",\n        \"phone\": \"{phoneNumber}\"\n      }\n    }\n  }\n]"
+              },
+              "response": []
+            },
+            {
+              "name": "Get SecondTag",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "7349c0cf-d179-4e68-8152-a6bb4a545700",
+                    "exec": [
+                      "const tweetSchema = pm.environment.get('tweetSchema')",
+                      "",
+                      "const schema = {",
+                      "    type: 'array',",
+                      "    description: 'An array of tweet dto\\'s',",
+                      "    items: { $ref: tweetSchema }",
+                      "}",
+                      "",
+                      "pm.test('Status success', () => {",
+                      "    pm.response.to.be.success",
+                      "})",
+                      "",
+                      "pm.test('Schema is valid', () => {",
+                      "  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true",
+                      "})",
+                      "",
+                      "if (pm.response.code >= 200 && pm.response.code < 300 && pm.response.json() !== null && Array.isArray(pm.response.json())) {",
+                      "    const content = pm.response.json().map(tweet => tweet.content)",
+                      "    const authors = pm.response.json().map(tweet => tweet.author.username)",
+                      "    ",
+                      "    pm.test('Should only contain the second user\\'s tweets', () => {",
+                      "        pm.expect(authors).to.include(pm.environment.get('secondUser'))",
+                      "        pm.expect(authors).to.not.include(pm.environment.get('firstUser'))",
+                      "    })",
+                      "    ",
+                      "    pm.test('Contains the secondUser\\'s tweet', () => {",
+                      "        pm.expect(content).to.include(`Tweet from the second user! @${pm.environment.get('firstUser')} #${pm.environment.get('secondTag')}`)",
+                      "        pm.expect(authors).to.include(pm.environment.get('secondUser'))",
+                      "    })",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "localhost:8080/tags/{{secondTag}}",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "tags",
+                    "{{secondTag}}"
+                  ]
+                },
+                "description": "Retrieves all (non-deleted) tweets tagged with the given hashtag label. The tweets should appear in reverse-chronological order. If no hashtag with the given label exists, an error should be sent in lieu of a response.\n\nA tweet is considered \"tagged\" by a hashtag if the tweet has content and the hashtag's label appears in that content following a #.\n\nResponse:\n[\n  {\n    \"id\": {id},\n    \"content\": \"{content}\",\n    \"posted\": {postedDate}\n    \"author\": {\n      \"username\": \"{username}\",\n      \"joined\": {joinedDate},\n      \"profile\": {\n        \"email\": \"{email}\",\n        \"firstName\": \"{firstname}\",\n        \"lastName\": \"{lastname}\",\n        \"phone\": \"{phoneNumber}\"\n      }\n    }\n  }\n]"
+              },
+              "response": []
+            }
+          ],
+          "description": "Tests for retrieving tweets.",
+          "protocolProfileBehavior": {},
+          "_postman_isSubFolder": true
+        }
+      ],
+      "protocolProfileBehavior": {}
+    },
+
+    {
+      "name": "Hashtag",
+      "item":  [
+
+      ],
+      "protocolProfileBehavior": {}
+    },
+
+    {
+      "name": "Validate",
+      "item": [
+
+      ],
+      "description": "requests for the validate endpoint.",
+      "protocolProfileBehavior": {}
+    },
+
+    {
+      "name": "Cleanup",
+      "item":  [
+
+      ],
+      "protocolProfileBehavior": {}
+    }
+  ],
+  "protocolProfileBehavior": {}
+}
