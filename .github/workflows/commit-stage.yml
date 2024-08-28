@@ -1,4 +1,4 @@
-name: Acceptance Stage
+name: Commit Stage
 on: push
 
 jobs:
