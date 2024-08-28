@@ -17,6 +17,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     public List<UserResponseDto> getAllUsers() {
-        return userMapper.entitiesToDtos(userRepository.findAll());
+        return userMapper.entitiesToDtos(userRepository.findByDeletedFalse());
     }
 }
