@@ -51,7 +51,7 @@ jobs:
 
       - name: Run application container
         run: |
-          docker run --network="host" \
+          docker run -d --network="host" \
           -e SEEDER.ENABLED=false \
           social_media_api
 #
