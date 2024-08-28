@@ -8,6 +8,8 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Data
 public class TweetResponseDto {
+	
+	private Long id;
 
     private UserResponseDto author;
 
