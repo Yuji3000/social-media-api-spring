@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
-      - name: Switch to project directory
-        run: cd ./socialMediaApi
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -25,7 +23,10 @@ jobs:
         run: npm install -g newman
       - name: Compile project
         run: mvn clean compile
+        working-directory: ./socialMediaApi
       - name: Run tests
         run: mvn test
-      - name: Installs correctly
+        working-directory: ./socialMediaApi
+      - name: Installs normally
         run: mvn install
+        working-directory: ./socialMediaApi
