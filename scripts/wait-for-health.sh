@@ -13,13 +13,17 @@ while true; do
     exit 1
   fi
 
-  # Check the health endpoint
-  HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" http://localhost:8080/actuator/health)
+  # Check the health endpoint and log the response
+  RESPONSE=$(curl -s -o /dev/stderr -w "%{http_code}" http://localhost:8080/actuator/health)
+  HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+
   if [ "$HTTP_STATUS" -eq 200 ]; then
     echo "Application is healthy."
     break
   else
-    echo "Waiting for application to become healthy..."
+    echo "Waiting for application to become healthy... (HTTP status: $HTTP_STATUS)"
+    echo "Response:"
+    echo "$RESPONSE"
   fi
 
   sleep $INTERVAL
