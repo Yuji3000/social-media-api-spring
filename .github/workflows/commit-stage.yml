@@ -4,29 +4,60 @@ on: push
 jobs:
   build:
     name: Build & Test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       security-events: write
+
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container (becomes the hostname)
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: bondstone
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: corretto
           java-version: 22
           cache: maven
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
+
       - name: Install newman
         run: npm install -g newman
-      - name: Compile project
-        run: mvn clean compile
+
+      - name: Build, Test, Install, Package
+        run: mvn spring-boot:build-image
         working-directory: ./socialMediaApi
-      - name: Run tests
-        run: mvn test
-        working-directory: ./socialMediaApi
-      - name: Installs normally
-        run: mvn install
-        working-directory: ./socialMediaApi
+
+      - name: Run application container
+        run: |
+          docker run -d --network="host" \
+          -e DATASOURCE_HOST=postgres \
+          -e SEEDER.ENABLED=false   
+          social_media_api
+
+      - name: Wait for the app to be healthy
+        run: ./scripts/wait-for-health.sh
+
+      - name: Run Postman tests
+        run: newman run "Assessment 1 Test Suite Implemented Tests.postman_collection.json" -e "Assessment 1.postman_environment.json"
