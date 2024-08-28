@@ -56,6 +56,9 @@ jobs:
           -e SEEDER.ENABLED=false \
           social_media_api
 
+      - name: Give execute permission to health check script
+        run: chmod +x ./scripts/wait-for-health.sh
+
       - name: Wait for the app to be healthy
         run: ./scripts/wait-for-health.sh
 
