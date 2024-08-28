@@ -52,7 +52,6 @@ jobs:
       - name: Run application container
         run: |
           docker run --network="host" \
-          -e DATASOURCE_HOST=postgres \
           -e SEEDER.ENABLED=false \
           social_media_api
 #
