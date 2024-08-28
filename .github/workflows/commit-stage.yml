@@ -54,12 +54,12 @@ jobs:
           docker run -d --network="host" \
           -e SEEDER.ENABLED=false \
           social_media_api
-#
-#      - name: Give execute permission to health check script
-#        run: chmod +x ./scripts/wait-for-health.sh
-#
-#      - name: Wait for the app to be healthy
-#        run: ./scripts/wait-for-health.sh
-#
-#      - name: Run Postman tests
-#        run: newman run "Assessment 1 Test Suite Implemented Tests.postman_collection.json" -e "Assessment 1.postman_environment.json"
+
+      - name: Give execute permission to health check script
+        run: chmod +x ./scripts/wait-for-health.sh
+
+      - name: Wait for the app to be healthy
+        run: ./scripts/wait-for-health.sh
+
+      - name: Run Postman tests
+        run: newman run "Assessment 1 Test Suite Implemented Tests.postman_collection.json" -e "Assessment 1.postman_environment.json"
