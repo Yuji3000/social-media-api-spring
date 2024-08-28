@@ -62,4 +62,4 @@ jobs:
         run: ./scripts/wait-for-health.sh
 
       - name: Run Postman tests
-        run: newman run "Assessment 1 Test Suite Implemented Tests.postman_collection.json" -e "Assessment 1.postman_environment.json"
+        run: newman run "Assessment 1 Test Suite.postman_collection.json" -e "Assessment 1.postman_environment.json"
