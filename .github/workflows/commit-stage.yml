@@ -1,0 +1,31 @@
+name: Commit Stage
+on: push
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+      - name: Switch to project directory
+        run: cd ./socialMediaApi
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: corretto
+          java-version: 22
+          cache: maven
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+      - name: Install newman
+        run: npm install -g newman
+      - name: Compile project
+        run: mvn clean compile
+      - name: Run tests
+        run: mvn test
+      - name: Installs correctly
+        run: mvn install
