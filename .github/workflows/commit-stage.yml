@@ -49,12 +49,12 @@ jobs:
         run: mvn spring-boot:build-image
         working-directory: ./socialMediaApi
 
-#      - name: Run application container
-#        run: |
-#          docker run -d --network="host" \
-#          -e DATASOURCE_HOST=postgres \
-#          -e SEEDER.ENABLED=false \
-#          social_media_api
+      - name: Run application container
+        run: |
+          docker run --network="host" \
+          -e DATASOURCE_HOST=postgres \
+          -e SEEDER.ENABLED=false \
+          social_media_api
 #
 #      - name: Give execute permission to health check script
 #        run: chmod +x ./scripts/wait-for-health.sh
