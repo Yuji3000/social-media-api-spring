@@ -1,14 +1,15 @@
 package com.cooksys.socialMediaApi.mappers;
 
-import com.cooksys.socialMediaApi.dtos.HashtagDto;
+import com.cooksys.socialMediaApi.dtos.HashtagResponseDto;
 import com.cooksys.socialMediaApi.entities.Hashtag;
+import java.util.List;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface HashtagMapper {
 
-    Hashtag requestDtoToEntity(HashtagDto hashtagDto);
+    HashtagResponseDto entityToDto(Hashtag hashtag);
 
-    HashtagDto entityToDto(Hashtag hashtag);
+    List<HashtagResponseDto> entitiesToDtos(List<Hashtag> hashtags);
 
 }
