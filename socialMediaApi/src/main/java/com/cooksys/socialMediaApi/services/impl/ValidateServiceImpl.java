@@ -12,7 +12,7 @@ public class ValidateServiceImpl implements ValidateService {
     private final HashtagRepository hashtagRepository;
 
     public boolean validateHashtag(String label) {
-        return hashtagRepository.existsByLabelIs("#" + label);
+        return hashtagRepository.existsByLabel("#" + label);
     }
 
 }
