@@ -1,9 +1,13 @@
 package com.cooksys.socialMediaApi.services.impl;
 
+import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
+import com.cooksys.socialMediaApi.exceptions.NotFoundException;
+import com.cooksys.socialMediaApi.mappers.TweetMapper;
 import com.cooksys.socialMediaApi.entities.Hashtag;
 import com.cooksys.socialMediaApi.dtos.HashtagResponseDto;
 import com.cooksys.socialMediaApi.mappers.HashtagMapper;
 import com.cooksys.socialMediaApi.repositories.HashtagRepository;
+import com.cooksys.socialMediaApi.repositories.TweetRepository;
 import com.cooksys.socialMediaApi.services.HashtagService;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +20,8 @@ public class HashtagServiceImpl implements HashtagService {
 
     private final HashtagMapper hashtagMapper;
     private final HashtagRepository hashtagRepository;
+    private final TweetRepository tweetRepository;
+    private final TweetMapper tweetMapper;
 
     @Override
     public List<HashtagResponseDto> getTags() {
@@ -34,4 +40,11 @@ public class HashtagServiceImpl implements HashtagService {
 
         return optionalHashtag.get();
     }
+
+    public List<TweetResponseDto> tweetsByHashtag(String label) throws NotFoundException {
+        if (!hashtagRepository.existsByLabel("#" + label)) { throw new NotFoundException("Hashtag not found"); }
+
+        return tweetMapper.entitiesToDtos(tweetRepository.getByHashtag("#" + label));
+    }
+
 }
