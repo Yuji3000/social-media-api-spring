@@ -3,7 +3,9 @@ package com.cooksys.socialMediaApi;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import com.cooksys.socialMediaApi.entities.Credentials;
@@ -18,6 +20,8 @@ import com.cooksys.socialMediaApi.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
+@Slf4j
+@ConditionalOnProperty(name = "seeder.enabled")
 @RequiredArgsConstructor
 public class Seeder implements CommandLineRunner {
 
@@ -27,6 +31,8 @@ public class Seeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
+        log.info("Running seeder");
 
         // --- User 1 ---
         // Credentials
