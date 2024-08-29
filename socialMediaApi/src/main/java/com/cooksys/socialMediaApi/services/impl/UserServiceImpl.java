@@ -6,13 +6,9 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.cooksys.socialMediaApi.dtos.CredentialsDto;
-
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
-
 import com.cooksys.socialMediaApi.dtos.UserRequestDto;
-
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
-import com.cooksys.socialMediaApi.entities.Tweet;
 import com.cooksys.socialMediaApi.entities.User;
 import com.cooksys.socialMediaApi.exceptions.BadRequestException;
 import com.cooksys.socialMediaApi.exceptions.ConflictException;
