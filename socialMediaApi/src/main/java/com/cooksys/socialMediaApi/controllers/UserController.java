@@ -1,12 +1,10 @@
 package com.cooksys.socialMediaApi.controllers;
 
+import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 import com.cooksys.socialMediaApi.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,9 +17,14 @@ public class UserController {
 
     @GetMapping
     public List<UserResponseDto> getAllUsers() { return userService.getAllUsers(); }
-    
+
     @GetMapping("/@{username}")
     public UserResponseDto getUserByUsername(@PathVariable String username) {
     	return userService.getUserByUsername(username);
+    }
+
+    @DeleteMapping("/@{username}")
+    public UserResponseDto deleteUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
+        return userService.deleteUser(username, credentialsDto);
     }
 }
