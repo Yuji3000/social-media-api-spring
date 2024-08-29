@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	boolean existsByCredentialsUsername(String username);
 
-	@Query("SELECT t FROM Tweet t WHERE t.deleted = false AND LOWER(t.content) LIKE LOWER(CONCAT('%', :mention, '%')) ORDER BY t.posted DESC")
-	List<Tweet> findByMentionedUsernameDeletedFalse(@Param("mention") String mention);
+	@Query("SELECT t FROM Tweet t JOIN t.mentionedUsers u WHERE t.deleted = false AND u.credentials.username = :username ORDER BY t.posted DESC")
+	List<Tweet> findByMentionedUsernameDeletedFalse(@Param("username") String username);
 
 }

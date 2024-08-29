@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
+import com.cooksys.socialMediaApi.entities.Tweet;
 import com.cooksys.socialMediaApi.entities.User;
 import com.cooksys.socialMediaApi.exceptions.BadRequestException;
 import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
 
 	private void validateUserExistsAndActive(String username) {
-		if (userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username) == null) {
+		if (userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username).isEmpty()) {
 			throw new NotFoundException("User is not found or has been deleted.");
 		}
 	}
@@ -69,9 +70,9 @@ public class UserServiceImpl implements UserService {
 			throw new NotFoundException("User is not found or has been deleted.");
 		}
 		
-		User userToReturn = optionalUser.get();
-		String mention = "@" + userToReturn.getCredentials().getUsername();
-		return tweetMapper.entitiesToDtos(userRepository.findByMentionedUsernameDeletedFalse(mention));
+		String userName = optionalUser.get().getCredentials().getUsername();
+
+		return tweetMapper.entitiesToDtos(userRepository.findByMentionedUsernameDeletedFalse(userName));
 
 	}
 	
