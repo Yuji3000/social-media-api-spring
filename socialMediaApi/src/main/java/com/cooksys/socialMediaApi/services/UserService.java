@@ -18,11 +18,13 @@ public interface UserService {
 
 	User getUserEntityByUsername(String username);
 
+    UserResponseDto createUser(UserRequestDto userRequestDto);
+
 	UserResponseDto deleteUser(String username, CredentialsDto credentialsDto);
 
 	List<TweetResponseDto> getUserMentions(String username);
 
-    UserResponseDto createUser(UserRequestDto userRequestDto);
+	List<UserResponseDto> getFollowingUsers(String username);
 
 	boolean userActive(String username);
 }
