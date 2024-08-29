@@ -37,7 +37,7 @@ public class TweetServiceImpl implements TweetService {
 	}
 
 	@Override
-	public List<TweetRepostResponseDto> getAllReposts(Long id) {
+	public List<TweetResponseDto> getAllReposts(Long id) {
 		Tweet originalTweet = getTweet(id);
 
 		List<Tweet> filteredTweets = originalTweet.getReposts()
@@ -45,6 +45,13 @@ public class TweetServiceImpl implements TweetService {
 				.filter(repost -> !repost.isDeleted())
 				.collect(Collectors.toList());
 		
-		return tweetMapper.entitiesToRepostDtos(filteredTweets);
+		List<TweetResponseDto> tweetResponse = tweetMapper.entitiesToDtos(filteredTweets);
+		
+		for (TweetResponseDto dto : tweetResponse) {
+			dto.setInReplyTo(null);
+			dto.setRepostOf(null);
+		}
+		
+		return tweetResponse;
 	}
 }
