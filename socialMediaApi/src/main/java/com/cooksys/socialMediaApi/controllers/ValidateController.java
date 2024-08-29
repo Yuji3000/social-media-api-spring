@@ -22,4 +22,7 @@ public class ValidateController {
     @GetMapping("/tag/exists/{label}")
     public boolean validateHashtag(@PathVariable String label) { return validateService.validateHashtag(label); }
 
+    @GetMapping("/username/available/@{username}")
+    public boolean validateUsernameAvailable(@PathVariable String username) { 
+    	return !validateService.validateUsernameAvailable(username);}
 }

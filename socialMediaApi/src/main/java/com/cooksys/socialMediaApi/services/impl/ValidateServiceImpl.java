@@ -21,6 +21,9 @@ public class ValidateServiceImpl implements ValidateService {
         return hashtagRepository.existsByLabel("#" + label);
     }
 
-
+	@Override
+	public boolean validateUsernameAvailable(String username) {
+		return userRepository.existsByCredentialsUsername(username);
+	}
 
 }
