@@ -30,7 +30,6 @@ public class UserServiceImpl implements UserService {
 	private final TweetMapper tweetMapper;
 	private final UserRepository userRepository;
 
-
 	private void validateUserExistsAndActive(String username) {
 		if (userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username).isEmpty()) {
 			throw new NotFoundException("User is not found or has been deleted.");
@@ -61,22 +60,43 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User authenticateUser(CredentialsDto credentialsDto) {
+        Optional<User> optionalUser = userRepository
+            .findByCredentialsIgnoreCaseUsernameAndDeletedFalse(credentialsDto.getUsername());
 
+        if (optionalUser.isEmpty()) {
+            throw new NotFoundException("User not found");
+        }
+
+        User user = optionalUser.get();
+
+        if (!credentialsDto.getPassword().equals(user.getCredentials().getPassword())) {
+            throw new NotAuthorizedException("Invalid credentials");
+        }
+
+        return user;
+    }
+
+    @Override
 	public List<UserResponseDto> getAllUsers() {
 		return userMapper.entitiesToDtos(userRepository.findByDeletedFalse());
 	}
 
     @Override
 	public UserResponseDto getUserByUsername(String username) {
+		return userMapper.entityToDto(getUserEntityByUsername(username));
+	}
+
+    @Override
+    public User getUserEntityByUsername(String username) {
         Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
 
-		if (optionalUser.isEmpty()) {
-			throw new NotFoundException("User is not found or has been deleted.");
-		}
+        if (optionalUser.isEmpty()) {
+            throw new NotFoundException("User is not found or has been deleted.");
+        }
 
-		User userToReturn = optionalUser.get();
-		return userMapper.entityToDto(userToReturn);
-	}
+        return optionalUser.get();
+    }
 
 	@Override
 	public List<TweetResponseDto> getUserMentions(String username) {
@@ -92,14 +112,13 @@ public class UserServiceImpl implements UserService {
 		return tweetMapper.entitiesToDtos(userRepository.findByMentionedUsernameDeletedFalse(userName));
 
 	}
-	
 
     @Override
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
         validateCreateUserRequest(userRequestDto);
 
         String username = userRequestDto.getCredentials().getUsername();
-        Optional<User> optionalUser = userRepository.findByCredentialsUsername(username);
+        Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsername(username);
 
         if (optionalUser.isPresent()) {
             User existingUser = optionalUser.get();
@@ -120,21 +139,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto deleteUser(String username, CredentialsDto credentialsDto) {
         validateCredentials(credentialsDto);
 
-        if (!credentialsDto.getUsername().equalsIgnoreCase(username)) {
-            throw new NotAuthorizedException("User to delete does not match user in given credentials");
-        }
-
-        Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
-
-        if (optionalUser.isEmpty()) {
-            throw new NotFoundException("User not found");
-        }
-
-        User user = optionalUser.get();
-
-        if (!credentialsDto.getPassword().equals(user.getCredentials().getPassword())) {
-            throw new NotAuthorizedException("Invalid credentials");
-        }
+        User user = authenticateUser(credentialsDto);
 
         user.setDeleted(true);
         userRepository.saveAndFlush(user);
@@ -149,14 +154,19 @@ public class UserServiceImpl implements UserService {
 		if (optionalUser.isEmpty()) {
 			throw new NotFoundException("User is not found or has been deleted.");
 		}
-		
+
 		User user = optionalUser.get();
-		
+
 		 List<User> followers = user.getFollowers()
 		            .stream()
 		            .filter(follower -> !follower.isDeleted())
 		            .collect(Collectors.toList());
-		
+
 		return userMapper.entitiesToDtos(followers);
 	}
+
+    @Override
+    public boolean userActive(String username) {
+        return userRepository.existsByCredentialsIgnoreCaseUsernameAndDeletedIsFalse(username);
+    }
 }

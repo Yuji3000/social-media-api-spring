@@ -14,7 +14,7 @@ public class ValidateServiceImpl implements ValidateService {
     private final HashtagRepository hashtagRepository;
 
     @Override
-    public boolean validateUsername(String username) { return userRepository.existsByCredentialsUsername(username); }
+    public boolean validateUsername(String username) { return userRepository.existsByCredentialsIgnoreCaseUsername(username); }
 
     @Override
     public boolean validateHashtag(String label) {
