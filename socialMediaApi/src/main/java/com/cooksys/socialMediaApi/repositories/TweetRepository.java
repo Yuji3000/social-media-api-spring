@@ -27,7 +27,7 @@ public interface TweetRepository extends JpaRepository<Tweet, Long> {
 	 * to match. It also prevents something like "#hash,tag" or "#hash tag"
 	 * from matching.
 	 */
-	@Query(value = "SELECT * FROM Tweet t WHERE t.deleted IS FALSE AND t.content ~* ('[^\\w\\s]?' || :label || '[^\\w\\s]*')", nativeQuery = true)
+	@Query(value = "SELECT * FROM Tweet t WHERE t.deleted IS FALSE AND t.content ~* ('[^\\w\\s]*' || :label || '[^\\w\\s]*')", nativeQuery = true)
 	public List<Tweet> getByHashtag(@Param("label") String label);
 
 }
