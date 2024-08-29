@@ -1,6 +1,7 @@
 package com.cooksys.socialMediaApi.controllers;
 
 import com.cooksys.socialMediaApi.dtos.UserRequestDto;
+import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 import com.cooksys.socialMediaApi.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +27,10 @@ public class UserController {
     @PostMapping
     public UserResponseDto createUser(@RequestBody UserRequestDto userRequestDto) {
         return userService.createUser(userRequestDto);
+    }
+
+    @DeleteMapping("/@{username}")
+    public UserResponseDto deleteUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
+        return userService.deleteUser(username, credentialsDto);
     }
 }

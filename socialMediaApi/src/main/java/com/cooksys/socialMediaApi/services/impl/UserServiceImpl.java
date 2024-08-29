@@ -5,11 +5,13 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import com.cooksys.socialMediaApi.dtos.UserRequestDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 import com.cooksys.socialMediaApi.entities.User;
 import com.cooksys.socialMediaApi.exceptions.BadRequestException;
 import com.cooksys.socialMediaApi.exceptions.ConflictException;
+import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
 import com.cooksys.socialMediaApi.mappers.UserMapper;
 import com.cooksys.socialMediaApi.repositories.UserRepository;
@@ -23,6 +25,13 @@ public class UserServiceImpl implements UserService {
 
 	private final UserMapper userMapper;
 	private final UserRepository userRepository;
+
+    private void validateCredentials(CredentialsDto credentialsDto) {
+        if (credentialsDto == null || credentialsDto.getUsername() == null || credentialsDto.getPassword() == null
+            || credentialsDto.getUsername().isBlank() || credentialsDto.getPassword().isBlank()) {
+            throw new BadRequestException("Full credentials required");
+        }
+    }
 
     private void validateCreateUserRequest(UserRequestDto userRequestDto) {
         var credentials = userRequestDto.getCredentials();
@@ -46,10 +55,11 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserResponseDto getUserByUsername(String username) {
-		if (userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username) == null) {
+        Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
+
+		if (optionalUser.isEmpty()) {
 			throw new NotFoundException("User is not found or has been deleted.");
 		}
-		Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
 
 		User userToReturn = optionalUser.get();
 		return userMapper.entityToDto(userToReturn);
@@ -75,5 +85,31 @@ public class UserServiceImpl implements UserService {
 
         User newUser = userMapper.requestDtoToEntity(userRequestDto);
         return userMapper.entityToDto(userRepository.saveAndFlush(newUser));
+    }
+
+    @Override
+    public UserResponseDto deleteUser(String username, CredentialsDto credentialsDto) {
+        validateCredentials(credentialsDto);
+
+        if (!credentialsDto.getUsername().equalsIgnoreCase(username)) {
+            throw new NotAuthorizedException("User to delete does not match user in given credentials");
+        }
+
+        Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
+
+        if (optionalUser.isEmpty()) {
+            throw new NotFoundException("User not found");
+        }
+
+        User user = optionalUser.get();
+
+        if (!credentialsDto.getPassword().equals(user.getCredentials().getPassword())) {
+            throw new NotAuthorizedException("Invalid credentials");
+        }
+
+        user.setDeleted(true);
+        userRepository.saveAndFlush(user);
+
+        return userMapper.entityToDto(user);
     }
 }
