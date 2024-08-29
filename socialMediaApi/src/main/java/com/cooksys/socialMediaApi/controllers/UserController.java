@@ -18,6 +18,11 @@ public class UserController {
     @GetMapping
     public List<UserResponseDto> getAllUsers() { return userService.getAllUsers(); }
 
+    @GetMapping("/@{username}")
+    public UserResponseDto getUserByUsername(@PathVariable String username) {
+    	return userService.getUserByUsername(username);
+    }
+
     @PostMapping
     public UserResponseDto createUser(@RequestBody UserRequestDto userRequestDto) {
         return userService.createUser(userRequestDto);
