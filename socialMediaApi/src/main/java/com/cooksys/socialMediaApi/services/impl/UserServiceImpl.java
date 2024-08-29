@@ -6,11 +6,16 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.cooksys.socialMediaApi.dtos.CredentialsDto;
+
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
+
+import com.cooksys.socialMediaApi.dtos.UserRequestDto;
+
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 import com.cooksys.socialMediaApi.entities.Tweet;
 import com.cooksys.socialMediaApi.entities.User;
 import com.cooksys.socialMediaApi.exceptions.BadRequestException;
+import com.cooksys.socialMediaApi.exceptions.ConflictException;
 import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
 import com.cooksys.socialMediaApi.mappers.TweetMapper;
@@ -40,6 +45,21 @@ public class UserServiceImpl implements UserService {
         if (credentialsDto == null || credentialsDto.getUsername() == null || credentialsDto.getPassword() == null
             || credentialsDto.getUsername().isBlank() || credentialsDto.getPassword().isBlank()) {
             throw new BadRequestException("Full credentials required");
+        }
+    }
+
+    private void validateCreateUserRequest(UserRequestDto userRequestDto) {
+        var credentials = userRequestDto.getCredentials();
+        var profile = userRequestDto.getProfile();
+
+        if (credentials == null || credentials.getUsername() == null || credentials.getPassword() == null
+            || profile == null || profile.getEmail() == null) {
+            throw new BadRequestException("Missing required fields");
+        }
+
+        if (credentials.getUsername().isBlank() || credentials.getPassword().isBlank()
+            || profile.getEmail().isBlank()) {
+            throw new BadRequestException("Required fields cannot be blank");
         }
     }
 
@@ -76,6 +96,28 @@ public class UserServiceImpl implements UserService {
 
 	}
 	
+
+    @Override
+    public UserResponseDto createUser(UserRequestDto userRequestDto) {
+        validateCreateUserRequest(userRequestDto);
+
+        String username = userRequestDto.getCredentials().getUsername();
+        Optional<User> optionalUser = userRepository.findByCredentialsUsername(username);
+
+        if (optionalUser.isPresent()) {
+            User existingUser = optionalUser.get();
+
+            if (existingUser.isDeleted()) {
+                existingUser.setDeleted(false);
+                return userMapper.entityToDto(userRepository.saveAndFlush(existingUser));
+            } else {
+                throw new ConflictException("User with the username '" + username + "' already exists");
+            }
+        }
+
+        User newUser = userMapper.requestDtoToEntity(userRequestDto);
+        return userMapper.entityToDto(userRepository.saveAndFlush(newUser));
+    }
 
     @Override
     public UserResponseDto deleteUser(String username, CredentialsDto credentialsDto) {
