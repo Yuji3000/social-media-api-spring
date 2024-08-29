@@ -1,6 +1,6 @@
 package com.cooksys.socialMediaApi.controllers;
 
-import com.cooksys.socialMediaApi.entities.Hashtag;
+import com.cooksys.socialMediaApi.dtos.HashtagResponseDto;
 import com.cooksys.socialMediaApi.services.HashtagService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class HashtagController {
     private final HashtagService hashtagService;
 
     @GetMapping
-    public List<Hashtag> getTags() {
+    public List<HashtagResponseDto> getTags() {
         return hashtagService.getTags();
     }
 }
