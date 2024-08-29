@@ -3,6 +3,7 @@ package com.cooksys.socialMediaApi.controllers.advice;
 import com.cooksys.socialMediaApi.dtos.ErrorDto;
 import com.cooksys.socialMediaApi.exceptions.BadRequestException;
 import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
+import com.cooksys.socialMediaApi.exceptions.ConflictException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -32,5 +33,11 @@ public class DefaultControllerAdvice {
     public ErrorDto handleNotAuthorizedException(HttpServletRequest request,
                                                  NotAuthorizedException notAuthorizedException) {
         return new ErrorDto(notAuthorizedException.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ConflictException.class)
+    public ErrorDto handleConflictException(HttpServletRequest request, ConflictException conflictException) {
+        return new ErrorDto(conflictException.getMessage());
     }
 }
