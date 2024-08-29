@@ -37,10 +37,11 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserResponseDto getUserByUsername(String username) {
-		if (userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username).isEmpty()) {
+        Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
+
+		if (optionalUser.isEmpty()) {
 			throw new NotFoundException("User is not found or has been deleted.");
 		}
-		Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
 
 		User userToReturn = optionalUser.get();
 		return userMapper.entityToDto(userToReturn);
@@ -50,13 +51,13 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto deleteUser(String username, Credentials credentials) {
         validateCredentials(credentials);
 
-        if (!credentials.getUsername().equals(username)) {
+        if (!credentials.getUsername().equalsIgnoreCase(username)) {
             throw new NotAuthorizedException("User to delete does not match user in given credentials");
         }
 
-        Optional<User> optionalUser = userRepository.findByCredentialsUsername(username);
+        Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
 
-        if (optionalUser.isEmpty() || optionalUser.get().isDeleted()) {
+        if (optionalUser.isEmpty()) {
             throw new NotFoundException("User not found");
         }
 
