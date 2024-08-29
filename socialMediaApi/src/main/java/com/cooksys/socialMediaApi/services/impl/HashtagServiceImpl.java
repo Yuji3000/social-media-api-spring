@@ -5,6 +5,7 @@ import com.cooksys.socialMediaApi.dtos.HashtagResponseDto;
 import com.cooksys.socialMediaApi.mappers.HashtagMapper;
 import com.cooksys.socialMediaApi.repositories.HashtagRepository;
 import com.cooksys.socialMediaApi.services.HashtagService;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
