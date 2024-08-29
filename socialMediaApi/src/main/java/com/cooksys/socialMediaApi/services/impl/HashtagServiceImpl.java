@@ -42,7 +42,7 @@ public class HashtagServiceImpl implements HashtagService {
     }
 
     public List<TweetResponseDto> tweetsByHashtag(String label) throws NotFoundException {
-        if (!hashtagRepository.existsByLabel("#" + label)) { throw new NotFoundException("Hashtag not found"); }
+        if (!hashtagRepository.existsByLabel("#" + label)) { throw new NotFoundException("Hashtag not found :#" + label); }
 
         return tweetMapper.entitiesToDtos(tweetRepository.getByHashtag("#" + label));
     }
