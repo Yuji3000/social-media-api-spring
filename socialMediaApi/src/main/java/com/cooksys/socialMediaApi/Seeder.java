@@ -171,7 +171,7 @@ public class Seeder implements CommandLineRunner {
         Tweet tweet1 = new Tweet();
         tweet1.setAuthor(user1);
         tweet1.setDeleted(false);
-        tweet1.setContent("This is some content 1 tweet1 #eldenlord #mario");
+        tweet1.setContent("This is some content 1 tweet1 #eldenlord #mario @therealmc");
         tweet1.setHashtags(Arrays.asList(hashtag1, hashtag2));
         tweet1.setMentionedUsers(Arrays.asList(user1, user2));
         tweetRepository.saveAndFlush(tweet1);
