@@ -72,4 +72,17 @@ public class UserServiceImpl implements UserService {
 
         return userMapper.entityToDto(user);
     }
+
+	@Override
+	public List<UserResponseDto> getFollowingUsers(String username) {
+		Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
+
+		if (optionalUser.isEmpty()) {
+			throw new NotFoundException("User is not found or has been deleted.");
+		}
+		
+		User user = optionalUser.get();
+		
+		return userMapper.entitiesToDtos(user.getFollowers());
+	}
 }

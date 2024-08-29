@@ -27,4 +27,9 @@ public class UserController {
     public UserResponseDto deleteUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
         return userService.deleteUser(username, credentialsDto);
     }
+    
+    @GetMapping("/@{username}/following")
+    public List<UserResponseDto> getFollowingUsers(@PathVariable String username) {
+    	return userService.getFollowingUsers(username);
+    }
 }
