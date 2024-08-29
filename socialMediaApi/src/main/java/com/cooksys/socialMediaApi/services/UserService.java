@@ -11,11 +11,16 @@ public interface UserService {
 
 	List<UserResponseDto> getAllUsers();
 
+
 	UserResponseDto getUserByUsername(String username);
 
 	UserResponseDto deleteUser(String username, CredentialsDto credentialsDto);
 
-	public List<TweetResponseDto> getUserMentions(String username);
+	List<UserResponseDto> getFollowingUsers(String username);
 
-    UserResponseDto createUser(UserRequestDto userRequestDto);
+	UserResponseDto createUser(UserRequestDto userRequestDto);
+
+	List<TweetResponseDto> getUserMentions(String username);
+
+
 }
