@@ -2,6 +2,7 @@ package com.cooksys.socialMediaApi.services;
 
 public interface ValidateService {
 
-    public boolean validateHashtag(String label);
+    boolean validateHashtag(String label);
 
+    boolean validateUsername(String username);
 }
