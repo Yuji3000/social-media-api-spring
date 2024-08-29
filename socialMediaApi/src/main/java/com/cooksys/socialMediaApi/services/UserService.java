@@ -1,8 +1,8 @@
 package com.cooksys.socialMediaApi.services;
 
+import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 
-import com.cooksys.socialMediaApi.entities.Credentials;
 import java.util.List;
 
 public interface UserService {
@@ -11,6 +11,6 @@ public interface UserService {
 
     UserResponseDto getUserByUsername(String username);
 
-    UserResponseDto deleteUser(String username, Credentials credentials);
+    UserResponseDto deleteUser(String username, CredentialsDto credentialsDto);
 
 }

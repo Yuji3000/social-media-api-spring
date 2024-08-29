@@ -1,12 +1,12 @@
 package com.cooksys.socialMediaApi.services.impl;
 
+import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
-import com.cooksys.socialMediaApi.entities.Credentials;
 import com.cooksys.socialMediaApi.entities.User;
 import com.cooksys.socialMediaApi.exceptions.BadRequestException;
 import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
@@ -23,9 +23,9 @@ public class UserServiceImpl implements UserService {
 	private final UserMapper userMapper;
 	private final UserRepository userRepository;
 
-    private void validateCredentials(Credentials credentials) {
-        if (credentials == null || credentials.getUsername() == null || credentials.getPassword() == null
-            || credentials.getUsername().isBlank() || credentials.getPassword().isBlank()) {
+    private void validateCredentials(CredentialsDto credentialsDto) {
+        if (credentialsDto == null || credentialsDto.getUsername() == null || credentialsDto.getPassword() == null
+            || credentialsDto.getUsername().isBlank() || credentialsDto.getPassword().isBlank()) {
             throw new BadRequestException("Full credentials required");
         }
     }
@@ -48,10 +48,10 @@ public class UserServiceImpl implements UserService {
 	}
 
     @Override
-    public UserResponseDto deleteUser(String username, Credentials credentials) {
-        validateCredentials(credentials);
+    public UserResponseDto deleteUser(String username, CredentialsDto credentialsDto) {
+        validateCredentials(credentialsDto);
 
-        if (!credentials.getUsername().equalsIgnoreCase(username)) {
+        if (!credentialsDto.getUsername().equalsIgnoreCase(username)) {
             throw new NotAuthorizedException("User to delete does not match user in given credentials");
         }
 
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
         User user = optionalUser.get();
 
-        if (!credentials.getPassword().equals(user.getCredentials().getPassword())) {
+        if (!credentialsDto.getPassword().equals(user.getCredentials().getPassword())) {
             throw new NotAuthorizedException("Invalid credentials");
         }
 
