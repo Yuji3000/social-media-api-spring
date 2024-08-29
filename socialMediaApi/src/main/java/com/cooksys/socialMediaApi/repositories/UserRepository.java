@@ -16,17 +16,15 @@ import com.cooksys.socialMediaApi.entities.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-
 	List<User> findByDeletedFalse();
 
-    Optional<User> findByCredentialsUsername(String username);
-
+    Optional<User> findByCredentialsIgnoreCaseUsername(String username);
 
 	Optional<User> findByCredentialsIgnoreCaseUsernameAndDeletedFalse(String username);
 
+	boolean existsByCredentialsIgnoreCaseUsername(String username);
 
-	boolean existsByCredentialsUsername(String username);
-
+	boolean existsByCredentialsIgnoreCaseUsernameAndDeletedIsFalse(String username);
 
 	@Query("SELECT t FROM Tweet t JOIN t.mentionedUsers u WHERE t.deleted = false AND u.credentials.username = :username ORDER BY t.posted DESC")
 	List<Tweet> findByMentionedUsernameDeletedFalse(@Param("username") String username);
