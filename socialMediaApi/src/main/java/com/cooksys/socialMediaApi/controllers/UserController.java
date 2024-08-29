@@ -18,6 +18,11 @@ public class UserController {
     @GetMapping
     public List<UserResponseDto> getAllUsers() { return userService.getAllUsers(); }
 
+    @GetMapping("/@{username}")
+    public UserResponseDto getUserByUsername(@PathVariable String username) {
+    	return userService.getUserByUsername(username);
+    }
+
     @DeleteMapping("/@{username}")
     public UserResponseDto deleteUser(@PathVariable String username, @RequestBody Credentials credentials) {
         return userService.deleteUser(username, credentials);
