@@ -1,15 +1,20 @@
 package com.cooksys.socialMediaApi.services;
 
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
+
+import com.cooksys.socialMediaApi.dtos.CredentialsDto;
+
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 
 import java.util.List;
 
 public interface UserService {
 
-    public List<UserResponseDto> getAllUsers();
+	List<UserResponseDto> getAllUsers();
 
-	public UserResponseDto getUserByUsername(String username);
+	UserResponseDto getUserByUsername(String username);
+
+	UserResponseDto deleteUser(String username, CredentialsDto credentialsDto);
 
 	public List<TweetResponseDto> getUserMentions(String username);
 
