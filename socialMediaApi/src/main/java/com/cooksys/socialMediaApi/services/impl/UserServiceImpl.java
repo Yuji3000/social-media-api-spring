@@ -23,8 +23,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     private void validateCredentials(Credentials credentials) {
-        if (credentials == null || credentials.getUsername().isBlank() || credentials.getPassword().isBlank()) {
-            throw new BadRequestException("Credentials required");
+        if (credentials == null || credentials.getUsername() == null || credentials.getPassword() == null
+            || credentials.getUsername().isBlank() || credentials.getPassword().isBlank()) {
+            throw new BadRequestException("Full credentials required");
         }
     }
 
@@ -36,6 +37,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto deleteUser(String username, Credentials credentials) {
         validateCredentials(credentials);
+
+        if (!credentials.getUsername().equals(username)) {
+            throw new NotAuthorizedException("User to delete does not match user in given credentials");
+        }
 
         Optional<User> optionalUser = userRepository.findByCredentialsUsername(username);
 
