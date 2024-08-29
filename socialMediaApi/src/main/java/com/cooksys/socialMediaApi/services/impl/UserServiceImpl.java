@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.cooksys.socialMediaApi.dtos.CredentialsDto;
+import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.dtos.UserRequestDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 import com.cooksys.socialMediaApi.entities.User;
@@ -13,6 +14,7 @@ import com.cooksys.socialMediaApi.exceptions.BadRequestException;
 import com.cooksys.socialMediaApi.exceptions.ConflictException;
 import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
+import com.cooksys.socialMediaApi.mappers.TweetMapper;
 import com.cooksys.socialMediaApi.mappers.UserMapper;
 import com.cooksys.socialMediaApi.repositories.UserRepository;
 import com.cooksys.socialMediaApi.services.UserService;
@@ -24,7 +26,16 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService {
 
 	private final UserMapper userMapper;
+	private final TweetMapper tweetMapper;
 	private final UserRepository userRepository;
+
+
+	private void validateUserExistsAndActive(String username) {
+		if (userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username).isEmpty()) {
+			throw new NotFoundException("User is not found or has been deleted.");
+		}
+	}
+
 
     private void validateCredentials(CredentialsDto credentialsDto) {
         if (credentialsDto == null || credentialsDto.getUsername() == null || credentialsDto.getPassword() == null
@@ -49,11 +60,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+
 	public List<UserResponseDto> getAllUsers() {
 		return userMapper.entitiesToDtos(userRepository.findByDeletedFalse());
 	}
 
-	@Override
+    @Override
 	public UserResponseDto getUserByUsername(String username) {
         Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
 
@@ -64,6 +76,22 @@ public class UserServiceImpl implements UserService {
 		User userToReturn = optionalUser.get();
 		return userMapper.entityToDto(userToReturn);
 	}
+
+	@Override
+	public List<TweetResponseDto> getUserMentions(String username) {
+		validateUserExistsAndActive(username);
+		Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
+		
+		if (optionalUser.isEmpty()) {
+			throw new NotFoundException("User is not found or has been deleted.");
+		}
+		
+		String userName = optionalUser.get().getCredentials().getUsername();
+
+		return tweetMapper.entitiesToDtos(userRepository.findByMentionedUsernameDeletedFalse(userName));
+
+	}
+	
 
     @Override
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
