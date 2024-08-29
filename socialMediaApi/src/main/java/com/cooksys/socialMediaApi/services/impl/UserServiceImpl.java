@@ -2,6 +2,7 @@ package com.cooksys.socialMediaApi.services.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -123,6 +124,11 @@ public class UserServiceImpl implements UserService {
 		
 		User user = optionalUser.get();
 		
-		return userMapper.entitiesToDtos(user.getFollowers());
+		 List<User> followers = user.getFollowers()
+		            .stream()
+		            .filter(follower -> !follower.isDeleted())
+		            .collect(Collectors.toList());
+		
+		return userMapper.entitiesToDtos(followers);
 	}
 }
