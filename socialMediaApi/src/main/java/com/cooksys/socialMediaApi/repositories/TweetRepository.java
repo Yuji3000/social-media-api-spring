@@ -17,17 +17,6 @@ public interface TweetRepository extends JpaRepository<Tweet, Long> {
 
 	Optional<Tweet> findByIdAndDeletedFalse(Long id);
 
-	/**
-	 * Find tweets that contain the desired hashtag and are not deleted.
-	 * The "#" symbol is expected to be included in the input. This symbol
-	 * will be appended to the input string by the caller.<p>
-	 *
-	 * It works by looking for a whole "word" like "#hashtag" and ignoring any
-	 * punctuation that may be present. This allows ",#hashtag" or "#hashtag."
-	 * to match. It also prevents something like "#hash,tag" or "#hash tag"
-	 * from matching.
-	 */
-	@Query(value = "SELECT * FROM Tweet t WHERE t.deleted IS FALSE AND t.content ~* ('[^\\w\\s]*' || :label || '[^\\w\\s]*')", nativeQuery = true)
-	public List<Tweet> getByHashtag(@Param("label") String label);
+	List<Tweet> findByDeletedFalseAndHashtagsLabelOrderByPostedDesc(String label);
 
 }
