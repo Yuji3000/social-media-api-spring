@@ -1,5 +1,6 @@
 package com.cooksys.socialMediaApi.controllers;
 
+import com.cooksys.socialMediaApi.dtos.ContextDto;
 import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
@@ -35,12 +36,14 @@ public class TweetController {
     	return tweetService.getAllReposts(id);
     }
 
+    @GetMapping("/{id}/context")
+    public ContextDto getTweetContext(@PathVariable Long id) { return tweetService.getTweetContext(id); }
+
     @PostMapping("/{id}/reply")
     public TweetResponseDto replyToTweet(@PathVariable Long id, @RequestBody TweetRequestDto tweetRequestDto) {
         User user = userService.authenticateUser(tweetRequestDto.getCredentials());
 
         return tweetService.replyToTweet(id, user, tweetRequestDto);
-
     }
 
     @PostMapping("/{id}/repost")

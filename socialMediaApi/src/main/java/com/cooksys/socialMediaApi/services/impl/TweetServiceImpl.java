@@ -1,12 +1,11 @@
 package com.cooksys.socialMediaApi.services.impl;
 
+import com.cooksys.socialMediaApi.dtos.ContextDto;
 import com.cooksys.socialMediaApi.entities.Hashtag;
 import com.cooksys.socialMediaApi.entities.User;
 import com.cooksys.socialMediaApi.services.HashtagService;
 import com.cooksys.socialMediaApi.services.UserService;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
@@ -101,6 +100,32 @@ public class TweetServiceImpl implements TweetService {
 		repost.setRepostOf(optionalTweetToRepost.get());
 
 		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repost));
+	}
+
+	@Override
+	public ContextDto getTweetContext(Long id) {
+		Tweet tweet = getTweetEntity(id);
+
+		List<TweetResponseDto> replies = tweet.getReplies().stream()
+			.filter(reply -> !reply.isDeleted())
+			.sorted(Comparator.comparing(Tweet::getPosted))
+			.map(tweetMapper::entityToDto)
+			.toList();
+
+		List<TweetResponseDto> repliedToChain = new ArrayList<>();
+
+		for (Tweet parentTweet = tweet.getInReplyTo(); parentTweet != null; parentTweet = parentTweet.getInReplyTo()) {
+			if (!parentTweet.isDeleted()) {
+				repliedToChain.add(tweetMapper.entityToDto(parentTweet));
+			}
+		}
+
+		ContextDto contextDto = new ContextDto();
+		contextDto.setTarget(tweetMapper.entityToDto(tweet));
+		contextDto.setBefore(repliedToChain);
+		contextDto.setAfter(replies);
+
+		return contextDto;
 	}
 
 	@Override
