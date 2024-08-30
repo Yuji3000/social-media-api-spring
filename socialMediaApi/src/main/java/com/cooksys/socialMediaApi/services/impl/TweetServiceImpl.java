@@ -24,8 +24,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TweetServiceImpl implements TweetService {
 
-  private final TweetRepository tweetRepository;
-  private final TweetMapper tweetMapper;
+    private final TweetRepository tweetRepository;
+    private final TweetMapper tweetMapper;
 	private final UserService userService;
 	private final HashtagService hashtagService;
   
@@ -35,82 +35,6 @@ public class TweetServiceImpl implements TweetService {
 			throw new NotFoundException("No Tweet with id: " + id);
 		}
 		return optionalTweet.get();
-	}
-
-	@Override
-	public List<TweetResponseDto> getAllTweets() {
-		return tweetMapper.entitiesToDtos(tweetRepository.findByDeletedFalseOrderByPostedDesc());
-	}
-
-	@Override
-	public TweetResponseDto repostTweet(Long id, User author) {
-		Optional<Tweet> optionalTweetToRepost = tweetRepository.findByIdAndDeletedFalse(id);
-
-		if (optionalTweetToRepost.isEmpty()) {
-			throw new NotFoundException("Tweet to repost not found");
-		}
-
-		Tweet repost = new Tweet();
-		repost.setAuthor(author);
-		repost.setRepostOf(optionalTweetToRepost.get());
-
-		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repost));
-	}
-
-	@Override
-	public List<TweetResponseDto> getDirectRepliesForTweet(Long id) {
-		Tweet tweet = getTweet(id);
-
-		List<TweetResponseDto> replies = tweet.getReplies().stream()
-			.filter(reply -> !reply.isDeleted())
-			.map(tweetMapper::entityToDto)
-			.toList();
-
-		replies.forEach(reply -> reply.getInReplyTo().setInReplyTo(null));
-
-		return replies;
-	}
-
-	public List<TweetResponseDto> getAllReposts(Long id) {
-		Tweet originalTweet = getTweet(id);
-
-		List<Tweet> filteredTweets = originalTweet.getReposts()
-				.stream()
-				.filter(repost -> !repost.isDeleted())
-				.collect(Collectors.toList());
-		
-		List<TweetResponseDto> tweetResponse = tweetMapper.entitiesToDtos(filteredTweets);
-		
-		for (TweetResponseDto dto : tweetResponse) {
-			dto.setInReplyTo(null);
-			dto.setRepostOf(null);
-		}
-		
-		return tweetResponse;
-	}
-
-	/*
-	 * 1. check if tweet to reply to exists and is not deleted, otherwise throw exception
-	 * 2. create a tweet, setting the inReplyTo property to the tweet being replied to and the author to user's credentials
-	 * 3. check the tweet content for hashtags, saving any hashtags necessary and add it to the tweet
-	 * 4. check the tweet content for mentions, adding any mentions to the tweet
-	 * 5. save and return the tweet
-	 */
-	@Override
-	public TweetResponseDto replyToTweet(Long id, User author, TweetRequestDto tweetRequestDto) {
-		Optional<Tweet> optionalTweetToReplyTo = tweetRepository.findByIdAndDeletedFalse(id);
-
-		if (optionalTweetToReplyTo.isEmpty()) {
-			throw new NotFoundException("Tweet to reply to not found");
-		}
-
-		Tweet reply = tweetMapper.requestDtoToEntity(tweetRequestDto);
-		reply.setAuthor(author);
-		reply.setInReplyTo(optionalTweetToReplyTo.get());
-		reply.setHashtags(getHashtags(reply.getContent()));
-		reply.setMentionedUsers(getMentionedUsers(reply.getContent()));
-
-		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(reply));
 	}
 
 	/**
@@ -152,6 +76,75 @@ public class TweetServiceImpl implements TweetService {
 			.filter(userService::userActive)
 			.map(userService::getUserEntityByUsername)
 			.collect(Collectors.toList());
+	}
 
+	@Override
+	public List<TweetResponseDto> getAllTweets() {
+		return tweetMapper.entitiesToDtos(tweetRepository.findByDeletedFalseOrderByPostedDesc());
+	}
+
+	@Override
+	public TweetResponseDto repostTweet(Long id, User author) {
+		Optional<Tweet> optionalTweetToRepost = tweetRepository.findByIdAndDeletedFalse(id);
+
+		if (optionalTweetToRepost.isEmpty()) {
+			throw new NotFoundException("Tweet to repost not found");
+		}
+
+		Tweet repost = new Tweet();
+		repost.setAuthor(author);
+		repost.setRepostOf(optionalTweetToRepost.get());
+
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repost));
+	}
+
+	@Override
+	public List<TweetResponseDto> getDirectRepliesForTweet(Long id) {
+		Tweet tweet = getTweet(id);
+
+		List<TweetResponseDto> replies = tweet.getReplies().stream()
+			.filter(reply -> !reply.isDeleted())
+			.map(tweetMapper::entityToDto)
+			.toList();
+
+		replies.forEach(reply -> reply.getInReplyTo().setInReplyTo(null));
+
+		return replies;
+	}
+
+	@Override
+	public List<TweetResponseDto> getAllReposts(Long id) {
+		Tweet originalTweet = getTweet(id);
+
+		List<Tweet> filteredTweets = originalTweet.getReposts()
+				.stream()
+				.filter(repost -> !repost.isDeleted())
+				.collect(Collectors.toList());
+
+		List<TweetResponseDto> tweetResponse = tweetMapper.entitiesToDtos(filteredTweets);
+		
+		for (TweetResponseDto dto : tweetResponse) {
+			dto.setInReplyTo(null);
+			dto.setRepostOf(null);
+		}
+		
+		return tweetResponse;
+	}
+
+	@Override
+	public TweetResponseDto replyToTweet(Long id, User author, TweetRequestDto tweetRequestDto) {
+		Optional<Tweet> optionalTweetToReplyTo = tweetRepository.findByIdAndDeletedFalse(id);
+
+		if (optionalTweetToReplyTo.isEmpty()) {
+			throw new NotFoundException("Tweet to reply to not found");
+		}
+
+		Tweet reply = tweetMapper.requestDtoToEntity(tweetRequestDto);
+		reply.setAuthor(author);
+		reply.setInReplyTo(optionalTweetToReplyTo.get());
+		reply.setHashtags(getHashtags(reply.getContent()));
+		reply.setMentionedUsers(getMentionedUsers(reply.getContent()));
+
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(reply));
 	}
 }

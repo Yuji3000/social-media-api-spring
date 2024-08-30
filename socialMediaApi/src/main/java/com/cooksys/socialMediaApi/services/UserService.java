@@ -29,4 +29,6 @@ public interface UserService {
 	List<UserResponseDto> getFollowingUsers(String username);
 
 	boolean userActive(String username);
+
+	List<UserResponseDto> getFollowers(String username);
 }
