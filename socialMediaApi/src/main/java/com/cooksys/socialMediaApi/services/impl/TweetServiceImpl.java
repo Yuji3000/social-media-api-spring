@@ -9,13 +9,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
+import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 import com.cooksys.socialMediaApi.entities.Tweet;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
 import com.cooksys.socialMediaApi.mappers.TweetMapper;
+import com.cooksys.socialMediaApi.mappers.UserMapper;
 import com.cooksys.socialMediaApi.repositories.TweetRepository;
 import com.cooksys.socialMediaApi.services.TweetService;
 
@@ -31,7 +34,13 @@ public class TweetServiceImpl implements TweetService {
 	private final UserService userService;
 	private final HashtagService hashtagService;
 
-	private Tweet getTweetEntity(Long id) {
+
+	
+
+	private final UserMapper userMapper;
+
+	private Tweet getTweet(Long id) {
+
 		Optional<Tweet> optionalTweet = tweetRepository.findByIdAndDeletedFalse(id);
 		if (optionalTweet.isEmpty()) {
 			throw new NotFoundException("No Tweet with id: " + id);
@@ -91,6 +100,21 @@ public class TweetServiceImpl implements TweetService {
 	}
 
 	@Override
+	public List<UserResponseDto> getTweetMentions(Long id) {
+		Optional<Tweet> optionalTweet = tweetRepository.findByIdAndDeletedFalse(id);
+
+		if (optionalTweet.isEmpty()) {
+			throw new NotFoundException("Tweet not found with ID:" + id);
+		}
+
+		Tweet tweet = optionalTweet.get();
+		List<User> mentionedUsers = tweet.getMentionedUsers().stream().filter(user -> !user.isDeleted())
+				.collect(Collectors.toList());
+
+		return userMapper.entitiesToDtos(mentionedUsers);
+  }
+
+    @Override
 	public TweetResponseDto repostTweet(Long id, User author) {
 		Optional<Tweet> optionalTweetToRepost = tweetRepository.findByIdAndDeletedFalse(id);
 
@@ -138,7 +162,7 @@ public class TweetServiceImpl implements TweetService {
 				.stream()
 				.filter(repost -> !repost.isDeleted())
 				.collect(Collectors.toList());
-
+		
 		List<TweetResponseDto> tweetResponse = tweetMapper.entitiesToDtos(filteredTweets);
 		
 		for (TweetResponseDto dto : tweetResponse) {
