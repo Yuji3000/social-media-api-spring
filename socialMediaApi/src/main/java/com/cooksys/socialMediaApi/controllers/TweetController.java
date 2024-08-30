@@ -50,4 +50,11 @@ public class TweetController {
 
         return tweetService.repostTweet(id, user);
     }
+    
+    @DeleteMapping("/{id}")
+    public TweetResponseDto deleteTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
+    	User user = userService.authenticateUser(credentialsDto);
+    	
+    	return tweetService.deleteTweet(id, user);
+    }
 }

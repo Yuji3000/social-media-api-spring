@@ -15,6 +15,7 @@ import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 import com.cooksys.socialMediaApi.entities.Tweet;
+import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
 import com.cooksys.socialMediaApi.mappers.TweetMapper;
 import com.cooksys.socialMediaApi.mappers.UserMapper;
@@ -27,8 +28,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TweetServiceImpl implements TweetService {
 
-    private final TweetRepository tweetRepository;
-    private final TweetMapper tweetMapper;
+	private final TweetRepository tweetRepository;
+	private final TweetMapper tweetMapper;
 	private final UserService userService;
 	private final HashtagService hashtagService;
 	private final UserMapper userMapper;
@@ -100,7 +101,7 @@ public class TweetServiceImpl implements TweetService {
 				.collect(Collectors.toList());
 
 		return userMapper.entitiesToDtos(mentionedUsers);
-  }
+	}
 
     @Override
 	public TweetResponseDto repostTweet(Long id, User author) {
@@ -125,14 +126,14 @@ public class TweetServiceImpl implements TweetService {
 				.stream()
 				.filter(repost -> !repost.isDeleted())
 				.collect(Collectors.toList());
-		
+
 		List<TweetResponseDto> tweetResponse = tweetMapper.entitiesToDtos(filteredTweets);
-		
+
 		for (TweetResponseDto dto : tweetResponse) {
 			dto.setInReplyTo(null);
 			dto.setRepostOf(null);
 		}
-		
+
 		return tweetResponse;
 	}
 
@@ -151,5 +152,24 @@ public class TweetServiceImpl implements TweetService {
 		reply.setMentionedUsers(getMentionedUsers(reply.getContent()));
 
 		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(reply));
+	}
+
+	@Override
+	public TweetResponseDto deleteTweet(Long id, User author) {
+		Optional<Tweet> optionalTweet = tweetRepository.findByIdAndDeletedFalse(id);
+
+		if (optionalTweet.isEmpty()) {
+			throw new NotFoundException("Tweet not found with ID:" + id);
+		}
+
+		Tweet tweetToDelete = optionalTweet.get();
+		if (!tweetToDelete.getAuthor().equals(author)) {
+			throw new NotAuthorizedException("User is not authorized to delete this tweet");
+		}
+
+		tweetToDelete.setDeleted(true);
+		tweetRepository.save(tweetToDelete);
+
+		return tweetMapper.entityToDto(tweetToDelete);
 	}
 }
