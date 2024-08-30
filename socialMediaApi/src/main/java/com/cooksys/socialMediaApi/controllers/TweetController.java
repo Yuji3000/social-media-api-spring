@@ -3,6 +3,7 @@ package com.cooksys.socialMediaApi.controllers;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -74,13 +75,22 @@ public class TweetController {
         return tweetService.getTweetTags(id);
     }
     
+
+    @DeleteMapping("/{id}")
+    public TweetResponseDto deleteTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
+    	User user = userService.authenticateUser(credentialsDto);
+    	
+    	return tweetService.deleteTweet(id, user);
+    }
+    
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping("/{id}/like")
     public void likeTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
         User user = userService.authenticateUser(credentialsDto);
-
         tweetService.likeTweet(id, user);
     }
+
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
