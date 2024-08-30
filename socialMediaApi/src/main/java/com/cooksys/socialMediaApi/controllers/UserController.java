@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
@@ -67,6 +68,7 @@ public class UserController {
      return userService.getFollowingUsers(username);
    }
 
+ @ResponseStatus(HttpStatus.NO_CONTENT)
 	@PostMapping("/@{username}/follow")
 	public void followUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
 		User follower = userService.authenticateUser(credentialsDto);
