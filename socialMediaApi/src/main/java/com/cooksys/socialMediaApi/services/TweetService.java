@@ -22,9 +22,12 @@ public interface TweetService {
 
 	TweetResponseDto repostTweet(Long id, User author);
 
+	TweetResponseDto deleteTweet(Long id, User author);
+
 	List<HashtagResponseDto> getTweetTags(Long id);
   
 	void likeTweet(Long id, User user);
 
 	TweetResponseDto createTweet(TweetRequestDto tweetRequestDto, User author);
+
 }
