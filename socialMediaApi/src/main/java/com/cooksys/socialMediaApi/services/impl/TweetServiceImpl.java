@@ -35,6 +35,21 @@ public class TweetServiceImpl implements TweetService {
 		return tweetMapper.entitiesToDtos(tweetRepository.findByDeletedFalseOrderByPostedDesc());
 	}
 
+	@Override
+	public TweetResponseDto repostTweet(Long id, User author) {
+		Optional<Tweet> optionalTweetToRepost = tweetRepository.findByIdAndDeletedFalse(id);
+
+		if (optionalTweetToRepost.isEmpty()) {
+			throw new NotFoundException("Tweet to repost not found");
+		}
+
+		Tweet repost = new Tweet();
+		repost.setAuthor(author);
+		repost.setRepostOf(optionalTweetToRepost.get());
+
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repost));
+	}
+
 	/*
 	 * 1. check if tweet to reply to exists and is not deleted, otherwise throw exception
 	 * 2. create a tweet, setting the inReplyTo property to the tweet being replied to and the author to user's credentials
