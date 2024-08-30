@@ -2,7 +2,6 @@ package com.cooksys.socialMediaApi.controllers;
 
 import java.util.List;
 
-import com.cooksys.socialMediaApi.entities.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -17,6 +17,7 @@ import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.dtos.UserRequestDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
+import com.cooksys.socialMediaApi.entities.User;
 import com.cooksys.socialMediaApi.services.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -64,12 +65,12 @@ public class UserController {
 	}
 
     
-   @GetMapping("/@{username}/following")
-   public List<UserResponseDto> getFollowingUsers(@PathVariable String username) {
-     return userService.getFollowingUsers(username);
-   }
+  @GetMapping("/@{username}/following")
+    public List<UserResponseDto> getFollowingUsers(@PathVariable String username) {
+    return userService.getFollowingUsers(username);
+  }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
 	@PostMapping("/@{username}/follow")
 	public void followUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
 		User follower = userService.authenticateUser(credentialsDto);
@@ -77,4 +78,11 @@ public class UserController {
 		userService.followUser(username, follower);
 	}
 
+  @PostMapping("/@{username}/unfollow")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void unfollowUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
+		User follower = userService.authenticateUser(credentialsDto);
+
+		userService.unfollowUser(username, follower);
+	}
 }

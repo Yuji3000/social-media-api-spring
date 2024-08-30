@@ -17,6 +17,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @NoArgsConstructor
@@ -49,6 +50,7 @@ public class User {
     )
     private List<Tweet> likedTweets;
 
+	@ToString.Exclude
 	@ManyToMany(mappedBy = "mentionedUsers")
     private List<Tweet> mentionedTweets;
 

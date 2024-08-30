@@ -221,4 +221,19 @@ public class UserServiceImpl implements UserService {
     public boolean userActive(String username) {
         return userRepository.existsByCredentialsIgnoreCaseUsernameAndDeletedIsFalse(username);
     }
+
+
+	@Override
+	public void unfollowUser(String username, User follower) {
+		User user = getUserEntityByUsername(username);
+
+        List<User> following = follower.getFollowing();
+        if (following.contains(user)) {
+            following.remove(user);
+        } else {
+            throw new BadRequestException("This user is already unfollowed");
+        }
+
+        userRepository.saveAndFlush(follower);
+	}
 }
