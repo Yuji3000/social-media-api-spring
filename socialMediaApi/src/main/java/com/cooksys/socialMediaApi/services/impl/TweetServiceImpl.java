@@ -1,9 +1,13 @@
 package com.cooksys.socialMediaApi.services.impl;
 
+import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 import com.cooksys.socialMediaApi.entities.Hashtag;
 import com.cooksys.socialMediaApi.entities.User;
+import com.cooksys.socialMediaApi.mappers.UserMapper;
 import com.cooksys.socialMediaApi.services.HashtagService;
 import com.cooksys.socialMediaApi.services.UserService;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +32,7 @@ public class TweetServiceImpl implements TweetService {
 	private final TweetMapper tweetMapper;
 	private final UserService userService;
 	private final HashtagService hashtagService;
+	private final UserMapper userMapper;
 
 	private Tweet getTweetEntity(Long id) {
 		Optional<Tweet> optionalTweet = tweetRepository.findByIdAndDeletedFalse(id);
@@ -35,6 +40,27 @@ public class TweetServiceImpl implements TweetService {
 			throw new NotFoundException("No Tweet with id: " + id);
 		}
 		return optionalTweet.get();
+	}
+
+	/**
+	 * Gets all active users who liked the given tweet.
+	 *
+	 * @param id The ID of the tweet.
+	 * @return A list of active users the tweet was liked by.
+	 */
+	@Override
+	public List<UserResponseDto> getTweetLikes(Long id) {
+		Tweet tweet = getTweetEntity(id);
+
+		List<User> activeUsers = new ArrayList<>();
+
+		for (User user: tweet.getLikedByUsers()) {
+			if (userService.userActive(user.getCredentials().getUsername())) {
+				activeUsers.add(user);
+			}
+		}
+
+		return userMapper.entitiesToDtos(activeUsers);
 	}
 
 	/**

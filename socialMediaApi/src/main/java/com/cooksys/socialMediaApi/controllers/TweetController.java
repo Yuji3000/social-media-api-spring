@@ -3,6 +3,7 @@ package com.cooksys.socialMediaApi.controllers;
 import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
+import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 import com.cooksys.socialMediaApi.entities.User;
 import com.cooksys.socialMediaApi.services.TweetService;
 import com.cooksys.socialMediaApi.services.UserService;
@@ -48,5 +49,10 @@ public class TweetController {
         User user = userService.authenticateUser(credentialsDto);
 
         return tweetService.repostTweet(id, user);
+    }
+
+    @GetMapping("/{id}/likes")
+    public List<UserResponseDto> getTweetLikes(@PathVariable Long id) {
+        return tweetService.getTweetLikes(id);
     }
 }

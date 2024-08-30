@@ -1,6 +1,7 @@
 package com.cooksys.socialMediaApi.services;
 
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
+import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 import com.cooksys.socialMediaApi.entities.User;
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface TweetService {
 	TweetResponseDto replyToTweet(Long id, User author, TweetRequestDto tweetRequestDto);
 
 	TweetResponseDto repostTweet(Long id, User author);
+
+	List<UserResponseDto> getTweetLikes(Long id);
 }
