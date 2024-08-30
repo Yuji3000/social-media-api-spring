@@ -26,7 +26,6 @@ public class TweetController {
     	return tweetService.getAllTweets();
     }
     
-
     @GetMapping("/{id}/mentions")
     public List<UserResponseDto> getTweetMentions(@PathVariable Long id) {
     	return tweetService.getTweetMentions(id);
@@ -41,7 +40,6 @@ public class TweetController {
         User user = userService.authenticateUser(tweetRequestDto.getCredentials());
 
         return tweetService.replyToTweet(id, user, tweetRequestDto);
-
     }
 
     @PostMapping("/{id}/repost")
@@ -49,5 +47,11 @@ public class TweetController {
         User user = userService.authenticateUser(credentialsDto);
 
         return tweetService.repostTweet(id, user);
+    }
+    
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public TweetResponseDto createTweet(@RequestBody TweetRequestDto tweetRequestDto) {
+    	return tweetService.createTweet(tweetRequestDto);
     }
 }
