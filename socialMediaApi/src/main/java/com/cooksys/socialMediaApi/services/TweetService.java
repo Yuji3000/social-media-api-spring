@@ -20,4 +20,7 @@ public interface TweetService {
 	TweetResponseDto repostTweet(Long id, User author);
 
 	TweetResponseDto deleteTweet(Long id, User author);
+
+	TweetResponseDto createTweet(TweetRequestDto tweetRequestDto, User author);
+
 }

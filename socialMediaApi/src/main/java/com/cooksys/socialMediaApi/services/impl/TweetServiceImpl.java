@@ -1,9 +1,5 @@
 package com.cooksys.socialMediaApi.services.impl;
 
-import com.cooksys.socialMediaApi.entities.Hashtag;
-import com.cooksys.socialMediaApi.entities.User;
-import com.cooksys.socialMediaApi.services.HashtagService;
-import com.cooksys.socialMediaApi.services.UserService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -11,16 +7,22 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
+import com.cooksys.socialMediaApi.entities.Hashtag;
 import com.cooksys.socialMediaApi.entities.Tweet;
 import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
+import com.cooksys.socialMediaApi.entities.User;
+import com.cooksys.socialMediaApi.exceptions.BadRequestException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
 import com.cooksys.socialMediaApi.mappers.TweetMapper;
 import com.cooksys.socialMediaApi.mappers.UserMapper;
 import com.cooksys.socialMediaApi.repositories.TweetRepository;
+import com.cooksys.socialMediaApi.services.HashtagService;
 import com.cooksys.socialMediaApi.services.TweetService;
+import com.cooksys.socialMediaApi.services.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +43,7 @@ public class TweetServiceImpl implements TweetService {
 		}
 		return optionalTweet.get();
 	}
+	
 
 	/**
 	 * Finds hashtags within a given string. The following rules decide which hashtags are valid:
@@ -72,8 +75,8 @@ public class TweetServiceImpl implements TweetService {
 	 * @param content the raw string contents of the tweet
 	 * @return a list of User entities identified without their '#' prefix
 	 */
-	private List<User> getMentionedUsers(String content) {
-		String sanitizedContent = content.replaceAll("[^#\\w]", " ");
+	private List<User> getMentionedUsers(String content) {    
+		String sanitizedContent = content.replaceAll("[^@\\w]", " ");
 
 		return Arrays.stream(sanitizedContent.split("\\s"))
 			.filter(word -> word.startsWith("@") && word.length() > 1)
@@ -171,5 +174,23 @@ public class TweetServiceImpl implements TweetService {
 		tweetRepository.save(tweetToDelete);
 
 		return tweetMapper.entityToDto(tweetToDelete);
-	}
+	 }
+	
+	@Override
+	public TweetResponseDto createTweet(TweetRequestDto tweetRequestDto, User author) {
+		if (tweetRequestDto.getContent().isEmpty()) {
+			throw new BadRequestException("Tweet content cannot be empty");
+		}
+		
+		Tweet tweet = tweetMapper.requestDtoToEntity(tweetRequestDto);
+		
+		tweet.setAuthor(author);
+		tweet.setInReplyTo(null);
+		tweet.setRepostOf(null);
+		tweet.setHashtags(getHashtags(tweet.getContent()));
+		tweet.setMentionedUsers(getMentionedUsers(tweet.getContent()));
+
+
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
+	 }
 }
