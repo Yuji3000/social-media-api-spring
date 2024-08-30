@@ -37,73 +37,6 @@ public class TweetServiceImpl implements TweetService {
 		return optionalTweet.get();
 	}
 
-	@Override
-	public TweetResponseDto getTweet(Long id) {
-		return tweetMapper.entityToDto(getTweetEntity(id));
-	}
-
-	@Override
-	public List<TweetResponseDto> getAllTweets() {
-		return tweetMapper.entitiesToDtos(tweetRepository.findByDeletedFalseOrderByPostedDesc());
-	}
-
-	@Override
-	public TweetResponseDto repostTweet(Long id, User author) {
-		Optional<Tweet> optionalTweetToRepost = tweetRepository.findByIdAndDeletedFalse(id);
-
-		if (optionalTweetToRepost.isEmpty()) {
-			throw new NotFoundException("Tweet to repost not found");
-		}
-
-		Tweet repost = new Tweet();
-		repost.setAuthor(author);
-		repost.setRepostOf(optionalTweetToRepost.get());
-
-		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repost));
-	}
-
-	public List<TweetResponseDto> getAllReposts(Long id) {
-		Tweet originalTweet = getTweetEntity(id);
-
-		List<Tweet> filteredTweets = originalTweet.getReposts()
-				.stream()
-				.filter(repost -> !repost.isDeleted())
-				.collect(Collectors.toList());
-		
-		List<TweetResponseDto> tweetResponse = tweetMapper.entitiesToDtos(filteredTweets);
-		
-		for (TweetResponseDto dto : tweetResponse) {
-			dto.setInReplyTo(null);
-			dto.setRepostOf(null);
-		}
-		
-		return tweetResponse;
-	}
-
-	/*
-	 * 1. check if tweet to reply to exists and is not deleted, otherwise throw exception
-	 * 2. create a tweet, setting the inReplyTo property to the tweet being replied to and the author to user's credentials
-	 * 3. check the tweet content for hashtags, saving any hashtags necessary and add it to the tweet
-	 * 4. check the tweet content for mentions, adding any mentions to the tweet
-	 * 5. save and return the tweet
-	 */
-	@Override
-	public TweetResponseDto replyToTweet(Long id, User author, TweetRequestDto tweetRequestDto) {
-		Optional<Tweet> optionalTweetToReplyTo = tweetRepository.findByIdAndDeletedFalse(id);
-
-		if (optionalTweetToReplyTo.isEmpty()) {
-			throw new NotFoundException("Tweet to reply to not found");
-		}
-
-		Tweet reply = tweetMapper.requestDtoToEntity(tweetRequestDto);
-		reply.setAuthor(author);
-		reply.setInReplyTo(optionalTweetToReplyTo.get());
-		reply.setHashtags(getHashtags(reply.getContent()));
-		reply.setMentionedUsers(getMentionedUsers(reply.getContent()));
-
-		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(reply));
-	}
-
 	/**
 	 * Finds hashtags within a given string. The following rules decide which hashtags are valid:
 	 * 1. The word must start with a '#'
@@ -143,6 +76,66 @@ public class TweetServiceImpl implements TweetService {
 			.filter(userService::userActive)
 			.map(userService::getUserEntityByUsername)
 			.collect(Collectors.toList());
+	}
 
+	@Override
+	public TweetResponseDto getTweet(Long id) {
+		return tweetMapper.entityToDto(getTweetEntity(id));
+	}
+
+	@Override
+	public List<TweetResponseDto> getAllTweets() {
+		return tweetMapper.entitiesToDtos(tweetRepository.findByDeletedFalseOrderByPostedDesc());
+	}
+
+	@Override
+	public TweetResponseDto repostTweet(Long id, User author) {
+		Optional<Tweet> optionalTweetToRepost = tweetRepository.findByIdAndDeletedFalse(id);
+
+		if (optionalTweetToRepost.isEmpty()) {
+			throw new NotFoundException("Tweet to repost not found");
+		}
+
+		Tweet repost = new Tweet();
+		repost.setAuthor(author);
+		repost.setRepostOf(optionalTweetToRepost.get());
+
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repost));
+	}
+
+	@Override
+	public List<TweetResponseDto> getAllReposts(Long id) {
+		Tweet originalTweet = getTweetEntity(id);
+
+		List<Tweet> filteredTweets = originalTweet.getReposts()
+				.stream()
+				.filter(repost -> !repost.isDeleted())
+				.collect(Collectors.toList());
+
+		List<TweetResponseDto> tweetResponse = tweetMapper.entitiesToDtos(filteredTweets);
+		
+		for (TweetResponseDto dto : tweetResponse) {
+			dto.setInReplyTo(null);
+			dto.setRepostOf(null);
+		}
+		
+		return tweetResponse;
+	}
+
+	@Override
+	public TweetResponseDto replyToTweet(Long id, User author, TweetRequestDto tweetRequestDto) {
+		Optional<Tweet> optionalTweetToReplyTo = tweetRepository.findByIdAndDeletedFalse(id);
+
+		if (optionalTweetToReplyTo.isEmpty()) {
+			throw new NotFoundException("Tweet to reply to not found");
+		}
+
+		Tweet reply = tweetMapper.requestDtoToEntity(tweetRequestDto);
+		reply.setAuthor(author);
+		reply.setInReplyTo(optionalTweetToReplyTo.get());
+		reply.setHashtags(getHashtags(reply.getContent()));
+		reply.setMentionedUsers(getMentionedUsers(reply.getContent()));
+
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(reply));
 	}
 }
