@@ -13,7 +13,6 @@ import java.util.List;
 import org.springframework.web.bind.annotation.*;
 
 
-import com.cooksys.socialMediaApi.dtos.TweetRepostResponseDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.services.TweetService;
 
@@ -35,6 +34,7 @@ public class TweetController {
     @GetMapping("/{id}/reposts")
     public List<TweetResponseDto> getAllReposts(@PathVariable Long id) {
     	return tweetService.getAllReposts(id);
+    }
 
     @PostMapping("/{id}/reply")
     public TweetResponseDto replyToTweet(@PathVariable Long id, @RequestBody TweetRequestDto tweetRequestDto) {

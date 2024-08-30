@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 
-import com.cooksys.socialMediaApi.dtos.TweetRepostResponseDto;
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.entities.Tweet;
@@ -18,5 +17,4 @@ public interface TweetMapper {
 
 	List<TweetResponseDto> entitiesToDtos(List<Tweet> entities);
 
-	List<TweetRepostResponseDto> entitiesToRepostDtos (List<Tweet> entities);
 }

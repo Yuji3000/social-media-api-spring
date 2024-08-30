@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
+import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.entities.Tweet;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
