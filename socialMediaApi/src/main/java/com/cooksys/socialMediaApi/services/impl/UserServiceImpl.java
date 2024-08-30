@@ -43,7 +43,6 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
-
     private void validateCredentials(CredentialsDto credentialsDto) {
         if (credentialsDto == null || credentialsDto.getUsername() == null || credentialsDto.getPassword() == null
             || credentialsDto.getUsername().isBlank() || credentialsDto.getPassword().isBlank()) {
