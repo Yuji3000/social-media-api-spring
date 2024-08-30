@@ -28,7 +28,7 @@ public class TweetServiceImpl implements TweetService {
     private final TweetMapper tweetMapper;
 	private final UserService userService;
 	private final HashtagService hashtagService;
-
+  
 	private Tweet getTweet(Long id) {
 		Optional<Tweet> optionalTweet = tweetRepository.findByIdAndDeletedFalse(id);
 		if (optionalTweet.isEmpty()) {
@@ -43,6 +43,20 @@ public class TweetServiceImpl implements TweetService {
 	}
 
 	@Override
+	public TweetResponseDto repostTweet(Long id, User author) {
+		Optional<Tweet> optionalTweetToRepost = tweetRepository.findByIdAndDeletedFalse(id);
+
+		if (optionalTweetToRepost.isEmpty()) {
+			throw new NotFoundException("Tweet to repost not found");
+		}
+
+		Tweet repost = new Tweet();
+		repost.setAuthor(author);
+		repost.setRepostOf(optionalTweetToRepost.get());
+
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repost));
+	}
+
 	public List<TweetResponseDto> getAllReposts(Long id) {
 		Tweet originalTweet = getTweet(id);
 
@@ -52,12 +66,12 @@ public class TweetServiceImpl implements TweetService {
 				.collect(Collectors.toList());
 
 		List<TweetResponseDto> tweetResponse = tweetMapper.entitiesToDtos(filteredTweets);
-
+		
 		for (TweetResponseDto dto : tweetResponse) {
 			dto.setInReplyTo(null);
 			dto.setRepostOf(null);
 		}
-
+		
 		return tweetResponse;
 	}
 
