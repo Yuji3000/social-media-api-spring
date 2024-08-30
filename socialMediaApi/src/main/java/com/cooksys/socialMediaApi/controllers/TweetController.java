@@ -72,6 +72,7 @@ public class TweetController {
         User user = userService.authenticateUser(credentialsDto);
 
         tweetService.likeTweet(id, user);
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
