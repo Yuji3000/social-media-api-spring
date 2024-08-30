@@ -82,8 +82,8 @@ public class TweetServiceImpl implements TweetService {
 	 * @param content the raw string contents of the tweet
 	 * @return a list of User entities identified without their '#' prefix
 	 */
-	private List<User> getMentionedUsers(String content) {
-		String sanitizedContent = content.replaceAll("[^#\\w]", " ");
+	private List<User> getMentionedUsers(String content) {    
+		String sanitizedContent = content.replaceAll("[^@\\w]", " ");
 
 		return Arrays.stream(sanitizedContent.split("\\s"))
 			.filter(word -> word.startsWith("@") && word.length() > 1)
@@ -170,15 +170,18 @@ public class TweetServiceImpl implements TweetService {
 		if (tweetRequestDto.getContent().isEmpty()) {
 			throw new BadRequestException("Tweet cannot be empty");
 		}
+		
 		CredentialsDto credentials = tweetRequestDto.getCredentials();
 		User user = userRepository.findByCredentialsUsernameAndCredentialsPasswordAndDeletedFalse(credentials.getUsername(), credentials.getPassword());
 		Tweet tweet = tweetMapper.requestDtoToEntity(tweetRequestDto);
+		
 		tweet.setAuthor(user);
+		tweet.setInReplyTo(null);
+		tweet.setRepostOf(null);
 		tweet.setHashtags(getHashtags(tweet.getContent()));
 		tweet.setMentionedUsers(getMentionedUsers(tweet.getContent()));
 
+
 		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
-		
-		return null;
 	}
 }
