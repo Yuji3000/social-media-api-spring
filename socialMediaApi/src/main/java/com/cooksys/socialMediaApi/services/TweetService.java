@@ -9,6 +9,8 @@ import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 
 public interface TweetService {
 
+	TweetResponseDto getTweet(Long id);
+
 	List<TweetResponseDto> getAllTweets();
 
 	List<UserResponseDto> getTweetMentions(Long id);
@@ -18,6 +20,8 @@ public interface TweetService {
 	TweetResponseDto replyToTweet(Long id, User author, TweetRequestDto tweetRequestDto);
 
 	TweetResponseDto repostTweet(Long id, User author);
+
+	void likeTweet(Long id, User user);
 
 	TweetResponseDto createTweet(TweetRequestDto tweetRequestDto, User author);
 }

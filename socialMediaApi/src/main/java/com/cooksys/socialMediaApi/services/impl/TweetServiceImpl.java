@@ -19,6 +19,7 @@ import com.cooksys.socialMediaApi.exceptions.NotFoundException;
 import com.cooksys.socialMediaApi.mappers.TweetMapper;
 import com.cooksys.socialMediaApi.mappers.UserMapper;
 import com.cooksys.socialMediaApi.repositories.TweetRepository;
+import com.cooksys.socialMediaApi.repositories.UserRepository;
 import com.cooksys.socialMediaApi.services.HashtagService;
 import com.cooksys.socialMediaApi.services.TweetService;
 import com.cooksys.socialMediaApi.services.UserService;
@@ -29,13 +30,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TweetServiceImpl implements TweetService {
 
-    private final TweetRepository tweetRepository;
-    private final TweetMapper tweetMapper;
+	private final UserRepository userRepository;
+	private final TweetRepository tweetRepository;
+	private final TweetMapper tweetMapper;
 	private final UserService userService;
 	private final HashtagService hashtagService;
 	private final UserMapper userMapper;
 
-	private Tweet getTweet(Long id) {
+	private Tweet getTweetEntity(Long id) {
 		Optional<Tweet> optionalTweet = tweetRepository.findByIdAndDeletedFalse(id);
 		if (optionalTweet.isEmpty()) {
 			throw new NotFoundException("No Tweet with id: " + id);
@@ -86,6 +88,11 @@ public class TweetServiceImpl implements TweetService {
 	}
 
 	@Override
+	public TweetResponseDto getTweet(Long id) {
+		return tweetMapper.entityToDto(getTweetEntity(id));
+	}
+
+	@Override
 	public List<TweetResponseDto> getAllTweets() {
 		return tweetMapper.entitiesToDtos(tweetRepository.findByDeletedFalseOrderByPostedDesc());
 	}
@@ -120,9 +127,34 @@ public class TweetServiceImpl implements TweetService {
 		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repost));
 	}
 
+	/**
+	 * Adds a tweet to the user's list of liked tweets. Nothing happens if the
+	 * tweet has already been liked. An exception is thrown if the tweet does
+	 * not exist.
+	 *
+	 * @param id
+	 * @param user
+	 */
+	@Override
+	public void likeTweet(Long id, User user) {
+		Optional<Tweet> optionalTweetToLike = tweetRepository.findByIdAndDeletedFalse(id);
+
+		if (optionalTweetToLike.isEmpty()) {
+			throw new NotFoundException("Tweet to like not found");
+		}
+		
+		Tweet tweetToLike = optionalTweetToLike.get();
+		List<Tweet> likedTweets = user.getLikedTweets();
+		if (!likedTweets.contains(tweetToLike)) {
+			likedTweets.add(tweetToLike);
+		}
+
+		userRepository.saveAndFlush(user);
+	}
+
 	@Override
 	public List<TweetResponseDto> getAllReposts(Long id) {
-		Tweet originalTweet = getTweet(id);
+		Tweet originalTweet = getTweetEntity(id);
 
 		List<Tweet> filteredTweets = originalTweet.getReposts()
 				.stream()
