@@ -33,14 +33,9 @@ public class TweetServiceImpl implements TweetService {
 	private final TweetMapper tweetMapper;
 	private final UserService userService;
 	private final HashtagService hashtagService;
-
-
-	
-
 	private final UserMapper userMapper;
 
 	private Tweet getTweetEntity(Long id) {
-
 		Optional<Tweet> optionalTweet = tweetRepository.findByIdAndDeletedFalse(id);
 		if (optionalTweet.isEmpty()) {
 			throw new NotFoundException("No Tweet with id: " + id);
