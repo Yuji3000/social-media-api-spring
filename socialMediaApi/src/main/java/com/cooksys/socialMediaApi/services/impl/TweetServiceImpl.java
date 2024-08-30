@@ -61,14 +61,6 @@ public class TweetServiceImpl implements TweetService {
 		return tweetResponse;
 	}
 
-
-	/*
-	 * 1. check if tweet to reply to exists and is not deleted, otherwise throw exception
-	 * 2. create a tweet, setting the inReplyTo property to the tweet being replied to and the author to user's credentials
-	 * 3. check the tweet content for hashtags, saving any hashtags necessary and add it to the tweet
-	 * 4. check the tweet content for mentions, adding any mentions to the tweet
-	 * 5. save and return the tweet
-	 */
 	@Override
 	public TweetResponseDto replyToTweet(Long id, User author, TweetRequestDto tweetRequestDto) {
 		Optional<Tweet> optionalTweetToReplyTo = tweetRepository.findByIdAndDeletedFalse(id);
