@@ -125,7 +125,7 @@ public class TweetServiceImpl implements TweetService {
 
 	@Override
 	public List<TweetResponseDto> getDirectRepliesForTweet(Long id) {
-		Tweet tweet = getTweet(id);
+		Tweet tweet = getTweetEntity(id);
 
 		List<TweetResponseDto> replies = tweet.getReplies().stream()
 			.filter(reply -> !reply.isDeleted())

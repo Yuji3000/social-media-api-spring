@@ -40,7 +40,7 @@ public class TweetController {
     @GetMapping("/{id}/mentions")
     public List<UserResponseDto> getTweetMentions(@PathVariable Long id) {
     	return tweetService.getTweetMentions(id);
-	  }
+    }
 
     @GetMapping("/{id}/reposts")
     public List<TweetResponseDto> getAllReposts(@PathVariable Long id) {
