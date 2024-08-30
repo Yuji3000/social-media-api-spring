@@ -22,9 +22,6 @@ import com.cooksys.socialMediaApi.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-
-import org.springframework.http.HttpStatus;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/tweets")
