@@ -106,26 +106,37 @@ public class TweetServiceImpl implements TweetService {
 	public ContextDto getTweetContext(Long id) {
 		Tweet tweet = getTweetEntity(id);
 
-		List<TweetResponseDto> replies = tweet.getReplies().stream()
-			.filter(reply -> !reply.isDeleted())
-			.sorted(Comparator.comparing(Tweet::getPosted))
-			.map(tweetMapper::entityToDto)
-			.toList();
+		List<Tweet> flattenedReplies = new ArrayList<>();
+		collectFlattenedReplies(tweet, flattenedReplies);
+		flattenedReplies.sort(Comparator.comparing(Tweet::getPosted));
 
-		List<TweetResponseDto> repliedToChain = new ArrayList<>();
-
-		for (Tweet parentTweet = tweet.getInReplyTo(); parentTweet != null; parentTweet = parentTweet.getInReplyTo()) {
-			if (!parentTweet.isDeleted()) {
-				repliedToChain.add(tweetMapper.entityToDto(parentTweet));
-			}
-		}
+		List<Tweet> tweetsRepliedToChain = new ArrayList<>();
+		collectTweetsRepliedToChain(tweet, tweetsRepliedToChain);
 
 		ContextDto contextDto = new ContextDto();
 		contextDto.setTarget(tweetMapper.entityToDto(tweet));
-		contextDto.setBefore(repliedToChain);
-		contextDto.setAfter(replies);
+		contextDto.setBefore(tweetMapper.entitiesToDtos(tweetsRepliedToChain));
+		contextDto.setAfter(tweetMapper.entitiesToDtos(flattenedReplies));
 
 		return contextDto;
+	}
+
+	private void collectTweetsRepliedToChain(Tweet tweet, List<Tweet> tweetsRepliedToChain) {
+		for (Tweet parentTweet = tweet.getInReplyTo(); parentTweet != null; parentTweet = parentTweet.getInReplyTo()) {
+			if (!parentTweet.isDeleted()) {
+				tweetsRepliedToChain.add(parentTweet);
+			}
+		}
+	}
+
+	private void collectFlattenedReplies(Tweet tweet, List<Tweet> flattenedReplies) {
+		for (Tweet reply : tweet.getReplies()) {
+			if (!reply.isDeleted()) {
+				flattenedReplies.add(reply);
+			}
+
+			collectFlattenedReplies(reply, flattenedReplies);
+		}
 	}
 
 	@Override
