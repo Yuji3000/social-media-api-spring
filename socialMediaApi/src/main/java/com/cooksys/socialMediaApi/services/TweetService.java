@@ -9,6 +9,8 @@ import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 
 public interface TweetService {
 
+	TweetResponseDto getTweet(Long id);
+
 	List<TweetResponseDto> getAllTweets();
 
 	List<UserResponseDto> getTweetMentions(Long id);

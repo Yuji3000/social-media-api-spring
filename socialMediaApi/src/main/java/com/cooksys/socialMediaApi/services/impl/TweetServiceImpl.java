@@ -27,13 +27,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TweetServiceImpl implements TweetService {
 
-    private final TweetRepository tweetRepository;
-    private final TweetMapper tweetMapper;
+	private final TweetRepository tweetRepository;
+	private final TweetMapper tweetMapper;
 	private final UserService userService;
 	private final HashtagService hashtagService;
 	private final UserMapper userMapper;
 
-	private Tweet getTweet(Long id) {
+
+	private Tweet getTweetEntity(Long id) {
 		Optional<Tweet> optionalTweet = tweetRepository.findByIdAndDeletedFalse(id);
 		if (optionalTweet.isEmpty()) {
 			throw new NotFoundException("No Tweet with id: " + id);
@@ -83,6 +84,11 @@ public class TweetServiceImpl implements TweetService {
 	}
 
 	@Override
+	public TweetResponseDto getTweet(Long id) {
+		return tweetMapper.entityToDto(getTweetEntity(id));
+	}
+
+	@Override
 	public List<TweetResponseDto> getAllTweets() {
 		return tweetMapper.entitiesToDtos(tweetRepository.findByDeletedFalseOrderByPostedDesc());
 	}
@@ -119,7 +125,7 @@ public class TweetServiceImpl implements TweetService {
 
 	@Override
 	public List<TweetResponseDto> getAllReposts(Long id) {
-		Tweet originalTweet = getTweet(id);
+		Tweet originalTweet = getTweetEntity(id);
 
 		List<Tweet> filteredTweets = originalTweet.getReposts()
 				.stream()
