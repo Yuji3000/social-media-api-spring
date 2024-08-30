@@ -1,5 +1,6 @@
 package com.cooksys.socialMediaApi.services;
 
+import com.cooksys.socialMediaApi.dtos.HashtagResponseDto;
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.entities.User;
 import java.util.List;
@@ -21,6 +22,8 @@ public interface TweetService {
 
 	TweetResponseDto repostTweet(Long id, User author);
 
+	List<HashtagResponseDto> getTweetTags(Long id);
+  
 	void likeTweet(Long id, User user);
 
 	TweetResponseDto createTweet(TweetRequestDto tweetRequestDto, User author);
