@@ -15,4 +15,6 @@ public interface TweetService {
 	TweetResponseDto replyToTweet(Long id, User author, TweetRequestDto tweetRequestDto);
 
 	TweetResponseDto repostTweet(Long id, User author);
+
+	List<TweetResponseDto> getDirectRepliesForTweet(Long id);
 }

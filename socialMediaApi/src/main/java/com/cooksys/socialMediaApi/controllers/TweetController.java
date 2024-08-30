@@ -12,12 +12,6 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
-
-import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
-import com.cooksys.socialMediaApi.services.TweetService;
-
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/tweets")
@@ -30,7 +24,12 @@ public class TweetController {
     public List<TweetResponseDto> getAllTweets() {
     	return tweetService.getAllTweets();
     }
-    
+
+    @GetMapping("/{id}/replies")
+    public List<TweetResponseDto> getDirectRepliesForTweet(@PathVariable Long id) {
+        return tweetService.getDirectRepliesForTweet(id);
+    }
+
     @GetMapping("/{id}/reposts")
     public List<TweetResponseDto> getAllReposts(@PathVariable Long id) {
     	return tweetService.getAllReposts(id);
@@ -41,7 +40,6 @@ public class TweetController {
         User user = userService.authenticateUser(tweetRequestDto.getCredentials());
 
         return tweetService.replyToTweet(id, user, tweetRequestDto);
-
     }
 
     @PostMapping("/{id}/repost")

@@ -57,6 +57,20 @@ public class TweetServiceImpl implements TweetService {
 		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repost));
 	}
 
+	@Override
+	public List<TweetResponseDto> getDirectRepliesForTweet(Long id) {
+		Tweet tweet = getTweet(id);
+
+		List<TweetResponseDto> replies = tweet.getReplies().stream()
+			.filter(reply -> !reply.isDeleted())
+			.map(tweetMapper::entityToDto)
+			.toList();
+
+		replies.forEach(reply -> reply.getInReplyTo().setInReplyTo(null));
+
+		return replies;
+	}
+
 	public List<TweetResponseDto> getAllReposts(Long id) {
 		Tweet originalTweet = getTweet(id);
 
