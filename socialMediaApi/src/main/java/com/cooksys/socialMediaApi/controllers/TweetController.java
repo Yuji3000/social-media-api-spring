@@ -67,6 +67,7 @@ public class TweetController {
     @GetMapping("/{id}/tags")
     public List<HashtagResponseDto> getTweetTags (@PathVariable Long id) {
         return tweetService.getTweetTags(id);
+    }
     
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping("/{id}/like")
