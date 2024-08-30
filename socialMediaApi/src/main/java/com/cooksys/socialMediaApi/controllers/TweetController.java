@@ -66,6 +66,7 @@ public class TweetController {
     @GetMapping("/{id}/likes")
     public List<UserResponseDto> getTweetLikes(@PathVariable Long id) {
         return tweetService.getTweetLikes(id);
+    }
     
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping("/{id}/like")
