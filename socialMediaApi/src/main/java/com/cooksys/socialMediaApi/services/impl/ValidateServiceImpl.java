@@ -23,7 +23,7 @@ public class ValidateServiceImpl implements ValidateService {
 
 	@Override
 	public boolean validateUsernameAvailable(String username) {
-		return userRepository.existsByCredentialsUsername(username);
+		return userRepository.existsByCredentialsIgnoreCaseUsername(username);
 	}
 
 }
