@@ -39,7 +39,7 @@ public class TweetServiceImpl implements TweetService {
 
 	private final UserMapper userMapper;
 
-	private Tweet getTweet(Long id) {
+	private Tweet getTweetEntity(Long id) {
 
 		Optional<Tweet> optionalTweet = tweetRepository.findByIdAndDeletedFalse(id);
 		if (optionalTweet.isEmpty()) {
