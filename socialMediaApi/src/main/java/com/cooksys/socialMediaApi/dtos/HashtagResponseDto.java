@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 
 @NoArgsConstructor
 @Data
-public class HashtagDto {
+public class HashtagResponseDto {
 
     private String label;
 
