@@ -1,5 +1,7 @@
 package com.cooksys.socialMediaApi.services.impl;
 
+import com.cooksys.socialMediaApi.entities.Tweet;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -147,7 +149,22 @@ public class UserServiceImpl implements UserService {
         return userMapper.entityToDto(user);
     }
 
-	@Override
+    @Override
+    public List<TweetResponseDto> getTweetsFromUser(String username) {
+        if (!userActive(username)) {
+            throw new NotFoundException("User not found");
+        }
+
+        User user = getUserEntityByUsername(username);
+
+        return user.getTweets().stream()
+            .filter(tweet -> !tweet.isDeleted())
+            .sorted(Comparator.comparing(Tweet::getPosted).reversed())
+            .map(tweetMapper::entityToDto)
+            .collect(Collectors.toList());
+    }
+
+    @Override
 	public List<UserResponseDto> getFollowingUsers(String username) {
 		Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
 
