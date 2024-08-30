@@ -64,14 +64,22 @@ public class UserController {
 	}
 
     
-   @GetMapping("/@{username}/following")
-   public List<UserResponseDto> getFollowingUsers(@PathVariable String username) {
-     return userService.getFollowingUsers(username);
-   }
+	@GetMapping("/@{username}/following")
+		public List<UserResponseDto> getFollowingUsers(@PathVariable String username) {
+		return userService.getFollowingUsers(username);
+	}
 
-   @PostMapping("/@{username}/unfollow")
-   @ResponseStatus(HttpStatus.NO_CONTENT)
-   public void unfollowUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PostMapping("/@{username}/follow")
+	public void followUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
+		User follower = userService.authenticateUser(credentialsDto);
+
+		userService.followUser(username, follower);
+	}
+
+	@PostMapping("/@{username}/unfollow")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void unfollowUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
 		User follower = userService.authenticateUser(credentialsDto);
 
 		userService.unfollowUser(username, follower);
