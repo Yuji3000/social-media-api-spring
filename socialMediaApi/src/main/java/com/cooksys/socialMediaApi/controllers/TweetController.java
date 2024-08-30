@@ -23,7 +23,6 @@ import com.cooksys.socialMediaApi.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/tweets")
@@ -35,6 +34,11 @@ public class TweetController {
     @GetMapping
     public List<TweetResponseDto> getAllTweets() {
     	return tweetService.getAllTweets();
+    }
+
+    @GetMapping("/{id}")
+    public TweetResponseDto getTweet(@PathVariable Long id) {
+        return tweetService.getTweet(id);
     }
     
     @GetMapping("/{id}/mentions")
@@ -60,6 +64,7 @@ public class TweetController {
         return tweetService.repostTweet(id, user);
     }
     
+
     @DeleteMapping("/{id}")
     public TweetResponseDto deleteTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
     	User user = userService.authenticateUser(credentialsDto);
@@ -67,6 +72,15 @@ public class TweetController {
     	return tweetService.deleteTweet(id, user);
     }
     
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/{id}/like")
+    public void likeTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
+        User user = userService.authenticateUser(credentialsDto);
+        tweetService.likeTweet(id, user);
+    }
+
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TweetResponseDto createTweet(@RequestBody TweetRequestDto tweetRequestDto) {
