@@ -49,7 +49,8 @@ public class TweetController {
 
         return tweetService.repostTweet(id, user);
     }
-
+    
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping("/{id}/like")
     public void likeTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
         User user = userService.authenticateUser(credentialsDto);
