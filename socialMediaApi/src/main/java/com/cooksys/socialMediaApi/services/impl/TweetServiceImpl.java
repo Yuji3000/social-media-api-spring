@@ -13,22 +13,16 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
-import com.cooksys.socialMediaApi.entities.Hashtag;
 import com.cooksys.socialMediaApi.entities.Tweet;
-import com.cooksys.socialMediaApi.entities.User;
 import com.cooksys.socialMediaApi.exceptions.BadRequestException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
 import com.cooksys.socialMediaApi.mappers.TweetMapper;
 import com.cooksys.socialMediaApi.mappers.UserMapper;
 import com.cooksys.socialMediaApi.repositories.TweetRepository;
-import com.cooksys.socialMediaApi.repositories.UserRepository;
-import com.cooksys.socialMediaApi.services.HashtagService;
 import com.cooksys.socialMediaApi.services.TweetService;
-import com.cooksys.socialMediaApi.services.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TweetServiceImpl implements TweetService {
 
-    private final UserRepository userRepository;
 	private final TweetRepository tweetRepository;
 	private final TweetMapper tweetMapper;
 	private final UserService userService;
@@ -137,8 +130,8 @@ public class TweetServiceImpl implements TweetService {
 	 * tweet has already been liked. An exception is thrown if the tweet does
 	 * not exist.
 	 *
-	 * @param id
-	 * @param user
+	 * @param id the id of the tweet to like
+	 * @param user the user liking the tweet
 	 */
 	@Override
 	public void likeTweet(Long id, User user) {
@@ -154,7 +147,7 @@ public class TweetServiceImpl implements TweetService {
 			likedTweets.add(tweetToLike);
 		}
 
-		userRepository.saveAndFlush(user);
+		userService.saveUser(user);
 	}
 
 	@Override
