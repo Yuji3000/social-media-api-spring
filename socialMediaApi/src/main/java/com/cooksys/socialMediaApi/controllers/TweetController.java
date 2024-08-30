@@ -1,8 +1,8 @@
 package com.cooksys.socialMediaApi.controllers;
 
-
 import java.util.List;
 
+import com.cooksys.socialMediaApi.dtos.CredentialsDto;
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
@@ -44,5 +44,12 @@ public class TweetController {
 
         return tweetService.replyToTweet(id, user, tweetRequestDto);
 
+    }
+
+    @PostMapping("/{id}/repost")
+    public TweetResponseDto repostTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
+        User user = userService.authenticateUser(credentialsDto);
+
+        return tweetService.repostTweet(id, user);
     }
 }

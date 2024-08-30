@@ -57,6 +57,20 @@ public class TweetServiceImpl implements TweetService {
 				.collect(Collectors.toList());
 
 		return userMapper.entitiesToDtos(mentionedUsers);
+  }
+  
+	public TweetResponseDto repostTweet(Long id, User author) {
+		Optional<Tweet> optionalTweetToRepost = tweetRepository.findByIdAndDeletedFalse(id);
+
+		if (optionalTweetToRepost.isEmpty()) {
+			throw new NotFoundException("Tweet to repost not found");
+		}
+
+		Tweet repost = new Tweet();
+		repost.setAuthor(author);
+		repost.setRepostOf(optionalTweetToRepost.get());
+
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repost));
 	}
 
 	public List<TweetResponseDto> getAllReposts(Long id) {
@@ -71,7 +85,6 @@ public class TweetServiceImpl implements TweetService {
 			dto.setInReplyTo(null);
 			dto.setRepostOf(null);
 		}
-
 		return tweetResponse;
 	}
 
