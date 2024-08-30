@@ -31,4 +31,6 @@ public interface UserService {
 	boolean userActive(String username);
 
 	List<UserResponseDto> getFollowers(String username);
+
+	void followUser(String user, User follower);
 }

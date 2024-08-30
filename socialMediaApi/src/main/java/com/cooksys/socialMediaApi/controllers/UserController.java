@@ -2,6 +2,7 @@ package com.cooksys.socialMediaApi.controllers;
 
 import java.util.List;
 
+import com.cooksys.socialMediaApi.entities.User;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,5 +66,12 @@ public class UserController {
    public List<UserResponseDto> getFollowingUsers(@PathVariable String username) {
      return userService.getFollowingUsers(username);
    }
+
+	@PostMapping("/@{username}/follow")
+	public void followUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
+		User follower = userService.authenticateUser(credentialsDto);
+
+		userService.followUser(username, follower);
+	}
 
 }
