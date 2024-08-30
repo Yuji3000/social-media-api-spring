@@ -36,7 +36,6 @@ public class TweetServiceImpl implements TweetService {
 
 	private final TweetRepository tweetRepository;
 	private final TweetMapper tweetMapper;
-	private final UserRepository userRepository;
 	private final UserService userService;
 	private final HashtagService hashtagService;
 	private final HashtagMapper hashtagMapper;
