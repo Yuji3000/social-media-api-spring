@@ -1,7 +1,9 @@
 package com.cooksys.socialMediaApi.services.impl;
 
+import com.cooksys.socialMediaApi.dtos.HashtagResponseDto;
 import com.cooksys.socialMediaApi.entities.Hashtag;
 import com.cooksys.socialMediaApi.entities.User;
+import com.cooksys.socialMediaApi.mappers.HashtagMapper;
 import com.cooksys.socialMediaApi.services.HashtagService;
 import com.cooksys.socialMediaApi.services.UserService;
 import java.util.Arrays;
@@ -28,6 +30,7 @@ public class TweetServiceImpl implements TweetService {
 	private final TweetMapper tweetMapper;
 	private final UserService userService;
 	private final HashtagService hashtagService;
+	private final HashtagMapper hashtagMapper;
 
 	private Tweet getTweetEntity(Long id) {
 		Optional<Tweet> optionalTweet = tweetRepository.findByIdAndDeletedFalse(id);
@@ -35,6 +38,19 @@ public class TweetServiceImpl implements TweetService {
 			throw new NotFoundException("No Tweet with id: " + id);
 		}
 		return optionalTweet.get();
+	}
+
+	/**
+	 * Gets all hashtags found in a tweet.
+	 *
+	 * @param id The ID of the tweet.
+	 * @return A list of the tweet's tags.
+	 */
+	@Override
+	public List<HashtagResponseDto> getTweetTags(Long id) {
+		Tweet tweet = getTweetEntity(id);
+
+		return hashtagMapper.entitiesToDtos(tweet.getHashtags());
 	}
 
 	/**
