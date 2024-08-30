@@ -1,5 +1,7 @@
 package com.cooksys.socialMediaApi.services.impl;
 
+import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +52,27 @@ public class TweetServiceImpl implements TweetService {
 	}
 	
 
+	/**
+	 * Gets all active users who liked the given tweet.
+	 *
+	 * @param id The ID of the tweet.
+	 * @return A list of active users the tweet was liked by.
+	 */
+	@Override
+	public List<UserResponseDto> getTweetLikes(Long id) {
+		Tweet tweet = getTweetEntity(id);
+
+		List<User> activeUsers = new ArrayList<>();
+
+		for (User user: tweet.getLikedByUsers()) {
+			if (userService.userActive(user.getCredentials().getUsername())) {
+				activeUsers.add(user);
+			}
+		}
+
+		return userMapper.entitiesToDtos(activeUsers);
+	}
+    
 	/**
 	 * Gets all hashtags found in a tweet.
 	 *
