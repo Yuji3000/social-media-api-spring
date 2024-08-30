@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cooksys.socialMediaApi.dtos.CredentialsDto;
+import com.cooksys.socialMediaApi.dtos.HashtagResponseDto;
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
@@ -66,6 +67,10 @@ public class TweetController {
     @GetMapping("/{id}/likes")
     public List<UserResponseDto> getTweetLikes(@PathVariable Long id) {
         return tweetService.getTweetLikes(id);
+  
+    @GetMapping("/{id}/tags")
+    public List<HashtagResponseDto> getTweetTags (@PathVariable Long id) {
+        return tweetService.getTweetTags(id);
     }
     
     @ResponseStatus(HttpStatus.NO_CONTENT)
