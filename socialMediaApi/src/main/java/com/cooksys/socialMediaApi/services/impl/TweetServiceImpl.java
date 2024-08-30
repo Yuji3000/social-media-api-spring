@@ -48,6 +48,20 @@ public class TweetServiceImpl implements TweetService {
 	}
 
 	@Override
+	public TweetResponseDto repostTweet(Long id, User author) {
+		Optional<Tweet> optionalTweetToRepost = tweetRepository.findByIdAndDeletedFalse(id);
+
+		if (optionalTweetToRepost.isEmpty()) {
+			throw new NotFoundException("Tweet to repost not found");
+		}
+
+		Tweet repost = new Tweet();
+		repost.setAuthor(author);
+		repost.setRepostOf(optionalTweetToRepost.get());
+
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repost));
+	}
+
 	public List<TweetResponseDto> getAllReposts(Long id) {
 		Tweet originalTweet = getTweetEntity(id);
 
@@ -65,7 +79,6 @@ public class TweetServiceImpl implements TweetService {
 		
 		return tweetResponse;
 	}
-
 
 	/*
 	 * 1. check if tweet to reply to exists and is not deleted, otherwise throw exception
