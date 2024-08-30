@@ -12,12 +12,6 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
-
-import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
-import com.cooksys.socialMediaApi.services.TweetService;
-
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/tweets")
