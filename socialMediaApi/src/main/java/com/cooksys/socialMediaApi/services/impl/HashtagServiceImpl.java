@@ -34,7 +34,7 @@ public class HashtagServiceImpl implements HashtagService {
 
         if (optionalHashtag.isEmpty()) {
             var newHashTag = new Hashtag();
-            newHashTag.setLabel(label);
+            newHashTag.setLabel("#" + label);
             return hashtagRepository.saveAndFlush(newHashTag);
         }
 

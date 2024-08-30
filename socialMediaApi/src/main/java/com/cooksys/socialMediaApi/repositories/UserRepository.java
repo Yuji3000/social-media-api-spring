@@ -28,5 +28,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	@Query("SELECT t FROM Tweet t JOIN t.mentionedUsers u WHERE t.deleted = false AND u.credentials.username = :username ORDER BY t.posted DESC")
 	List<Tweet> findByMentionedUsernameDeletedFalse(@Param("username") String username);
+	
+	User findByCredentialsUsernameAndCredentialsPasswordAndDeletedFalse(String username, String password);
 
 }
