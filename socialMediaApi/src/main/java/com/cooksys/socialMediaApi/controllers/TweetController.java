@@ -12,6 +12,7 @@ import com.cooksys.socialMediaApi.services.TweetService;
 import com.cooksys.socialMediaApi.services.UserService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -57,5 +58,21 @@ public class TweetController {
         User user = userService.authenticateUser(credentialsDto);
 
         return tweetService.repostTweet(id, user);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/{id}/like")
+    public void likeTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
+        User user = userService.authenticateUser(credentialsDto);
+
+        tweetService.likeTweet(id, user);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public TweetResponseDto createTweet(@RequestBody TweetRequestDto tweetRequestDto) {
+    	CredentialsDto credentialsDto = tweetRequestDto.getCredentials();
+    	User user = userService.authenticateUser(credentialsDto);
+    	return tweetService.createTweet(tweetRequestDto, user);
     }
 }

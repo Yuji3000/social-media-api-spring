@@ -22,5 +22,9 @@ public interface TweetService {
 
 	TweetResponseDto repostTweet(Long id, User author);
 
+	void likeTweet(Long id, User user);
+
+	TweetResponseDto createTweet(TweetRequestDto tweetRequestDto, User author);
+
 	ContextDto getTweetContext(Long id);
 }
