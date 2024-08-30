@@ -1,8 +1,11 @@
 package com.cooksys.socialMediaApi.services.impl;
 
+import com.cooksys.socialMediaApi.entities.Credentials;
+import com.cooksys.socialMediaApi.entities.Profile;
 import com.cooksys.socialMediaApi.entities.Tweet;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -19,6 +22,7 @@ import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
 import com.cooksys.socialMediaApi.mappers.TweetMapper;
 import com.cooksys.socialMediaApi.mappers.UserMapper;
+import com.cooksys.socialMediaApi.mappers.CredentialsMapper;
 import com.cooksys.socialMediaApi.repositories.UserRepository;
 import com.cooksys.socialMediaApi.services.UserService;
 
@@ -30,6 +34,7 @@ public class UserServiceImpl implements UserService {
 
 	private final UserMapper userMapper;
 	private final TweetMapper tweetMapper;
+    private final CredentialsMapper credentialsMapper;
 	private final UserRepository userRepository;
 
 	private void validateUserExistsAndActive(String username) {
@@ -59,6 +64,25 @@ public class UserServiceImpl implements UserService {
             || profile.getEmail().isBlank()) {
             throw new BadRequestException("Required fields cannot be blank");
         }
+    }
+
+    @Override
+    public UserResponseDto updateProfile(String username, UserRequestDto userRequestDto) {
+        User userRequest =  userMapper.requestDtoToEntity(userRequestDto);
+
+        Credentials credentials = userRequest.getCredentials();
+
+        User authenticated = authenticateUser(credentialsMapper.entityToDto(credentials));
+
+        if (!Objects.equals(username, authenticated.getCredentials().getUsername())) {
+            throw new BadRequestException("The credentials must match the user being updated.");
+        }
+
+        Profile modifiedProfile = userRequest.getProfile();
+
+        authenticated.setProfile(modifiedProfile);
+
+        return userMapper.entityToDto(userRepository.saveAndFlush(authenticated));
     }
 
     @Override
