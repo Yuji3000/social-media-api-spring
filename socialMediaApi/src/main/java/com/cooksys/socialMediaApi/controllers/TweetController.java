@@ -62,6 +62,8 @@ public class TweetController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TweetResponseDto createTweet(@RequestBody TweetRequestDto tweetRequestDto) {
-    	return tweetService.createTweet(tweetRequestDto);
+    	CredentialsDto credentialsDto = tweetRequestDto.getCredentials();
+    	User user = userService.authenticateUser(credentialsDto);
+    	return tweetService.createTweet(tweetRequestDto, user);
     }
 }

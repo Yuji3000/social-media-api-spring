@@ -19,7 +19,6 @@ import com.cooksys.socialMediaApi.exceptions.NotFoundException;
 import com.cooksys.socialMediaApi.mappers.TweetMapper;
 import com.cooksys.socialMediaApi.mappers.UserMapper;
 import com.cooksys.socialMediaApi.repositories.TweetRepository;
-import com.cooksys.socialMediaApi.repositories.UserRepository;
 import com.cooksys.socialMediaApi.services.HashtagService;
 import com.cooksys.socialMediaApi.services.TweetService;
 import com.cooksys.socialMediaApi.services.UserService;
@@ -31,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 public class TweetServiceImpl implements TweetService {
 
     private final TweetRepository tweetRepository;
-    private final UserRepository userRepository;
     private final TweetMapper tweetMapper;
 	private final UserService userService;
 	private final HashtagService hashtagService;
@@ -45,12 +43,6 @@ public class TweetServiceImpl implements TweetService {
 		return optionalTweet.get();
 	}
 	
-	 private void validateTweetRequest(TweetRequestDto tweetRequestDto) {
-	    	CredentialsDto credentials = tweetRequestDto.getCredentials();
-	    	if (userRepository.findByCredentialsUsernameAndCredentialsPasswordAndDeletedFalse(credentials.getUsername(), credentials.getPassword()) == null) {
-	            throw new BadRequestException("Invalid Credentials.");
-	        }
-	    }
 
 	/**
 	 * Finds hashtags within a given string. The following rules decide which hashtags are valid:
@@ -165,17 +157,14 @@ public class TweetServiceImpl implements TweetService {
 	}
 	
 	@Override
-	public TweetResponseDto createTweet(TweetRequestDto tweetRequestDto) {
-		validateTweetRequest(tweetRequestDto);
+	public TweetResponseDto createTweet(TweetRequestDto tweetRequestDto, User author) {
 		if (tweetRequestDto.getContent().isEmpty()) {
-			throw new BadRequestException("Tweet cannot be empty");
+			throw new BadRequestException("Tweet content cannot be empty");
 		}
 		
-		CredentialsDto credentials = tweetRequestDto.getCredentials();
-		User user = userRepository.findByCredentialsUsernameAndCredentialsPasswordAndDeletedFalse(credentials.getUsername(), credentials.getPassword());
 		Tweet tweet = tweetMapper.requestDtoToEntity(tweetRequestDto);
 		
-		tweet.setAuthor(user);
+		tweet.setAuthor(author);
 		tweet.setInReplyTo(null);
 		tweet.setRepostOf(null);
 		tweet.setHashtags(getHashtags(tweet.getContent()));
