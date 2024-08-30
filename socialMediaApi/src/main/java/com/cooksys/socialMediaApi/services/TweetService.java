@@ -8,6 +8,8 @@ import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 
 public interface TweetService {
 
+	TweetResponseDto getTweet(Long id);
+
 	List<TweetResponseDto> getAllTweets();
 
 	List<TweetResponseDto> getAllReposts(Long id);

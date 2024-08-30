@@ -12,12 +12,6 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
-
-import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
-import com.cooksys.socialMediaApi.services.TweetService;
-
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/tweets")
@@ -29,6 +23,11 @@ public class TweetController {
     @GetMapping
     public List<TweetResponseDto> getAllTweets() {
     	return tweetService.getAllTweets();
+    }
+
+    @GetMapping("/{id}")
+    public TweetResponseDto getTweet(@PathVariable Long id) {
+        return tweetService.getTweet(id);
     }
     
     @GetMapping("/{id}/reposts")
