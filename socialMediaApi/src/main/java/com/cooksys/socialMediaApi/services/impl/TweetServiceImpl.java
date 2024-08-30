@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.cooksys.socialMediaApi.dtos.CredentialsDto;
+import com.cooksys.socialMediaApi.dtos.HashtagResponseDto;
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
@@ -17,6 +18,7 @@ import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
 import com.cooksys.socialMediaApi.entities.User;
 import com.cooksys.socialMediaApi.exceptions.BadRequestException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
+import com.cooksys.socialMediaApi.mappers.HashtagMapper;
 import com.cooksys.socialMediaApi.mappers.TweetMapper;
 import com.cooksys.socialMediaApi.mappers.UserMapper;
 import com.cooksys.socialMediaApi.repositories.TweetRepository;
@@ -36,6 +38,7 @@ public class TweetServiceImpl implements TweetService {
 	private final TweetMapper tweetMapper;
 	private final UserService userService;
 	private final HashtagService hashtagService;
+	private final HashtagMapper hashtagMapper;
 	private final UserMapper userMapper;
 
 	private Tweet getTweetEntity(Long id) {
@@ -46,6 +49,19 @@ public class TweetServiceImpl implements TweetService {
 		return optionalTweet.get();
 	}
 	
+
+	/**
+	 * Gets all hashtags found in a tweet.
+	 *
+	 * @param id The ID of the tweet.
+	 * @return A list of the tweet's tags.
+	 */
+	@Override
+	public List<HashtagResponseDto> getTweetTags(Long id) {
+		Tweet tweet = getTweetEntity(id);
+
+		return hashtagMapper.entitiesToDtos(tweet.getHashtags());
+	}
 
 	/**
 	 * Finds hashtags within a given string. The following rules decide which hashtags are valid:

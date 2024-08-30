@@ -32,5 +32,7 @@ public interface UserService {
 
 	List<UserResponseDto> getFollowers(String username);
 
+	void followUser(String user, User follower);
+
 	void unfollowUser(String username, User follower);
 }
