@@ -65,6 +65,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Updates a user's profile. An error is thrown if the credentials do not
+     * match the username.
+     *
+     * @param username The user to be updated
+     * @param userRequestDto The credentials and updated profile
+     * @return Updated user profile
+     */
     @Override
     public UserResponseDto updateProfile(String username, UserRequestDto userRequestDto) {
         User userRequest =  userMapper.requestDtoToEntity(userRequestDto);
