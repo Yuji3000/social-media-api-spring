@@ -20,7 +20,7 @@ public interface UserService {
 
     UserResponseDto createUser(UserRequestDto userRequestDto);
 
-	User saveUser(User user);
+	void saveUser(User user);
 
 	UserResponseDto deleteUser(String username, CredentialsDto credentialsDto);
 
