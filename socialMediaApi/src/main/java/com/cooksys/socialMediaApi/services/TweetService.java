@@ -24,10 +24,12 @@ public interface TweetService {
 
 	List<UserResponseDto> getTweetLikes(Long id);
 
+	List<TweetResponseDto> getDirectRepliesForTweet(Long id);
+
 	TweetResponseDto deleteTweet(Long id, User author);
 
 	List<HashtagResponseDto> getTweetTags(Long id);
-  
+
 	void likeTweet(Long id, User user);
 
 	TweetResponseDto createTweet(TweetRequestDto tweetRequestDto, User author);

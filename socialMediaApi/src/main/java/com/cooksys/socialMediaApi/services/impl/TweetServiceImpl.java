@@ -164,6 +164,23 @@ public class TweetServiceImpl implements TweetService {
 		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repost));
 	}
 
+	@Override
+	public List<TweetResponseDto> getDirectRepliesForTweet(Long id) {
+		Tweet tweet = getTweetEntity(id);
+
+		List<TweetResponseDto> replies = tweet.getReplies().stream()
+			.filter(reply -> !reply.isDeleted())
+			.map(tweetMapper::entityToDto)
+			.toList();
+
+		replies.forEach(reply -> {
+			reply.setInReplyTo(null);
+			reply.setRepostOf(null);
+		});
+
+		return replies;
+	}
+
 	/**
 	 * Adds a tweet to the user's list of liked tweets. Nothing happens if the
 	 * tweet has already been liked. An exception is thrown if the tweet does
