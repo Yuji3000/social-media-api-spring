@@ -1,11 +1,17 @@
 package com.cooksys.socialMediaApi.controllers;
 
+
+import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
+import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
+import com.cooksys.socialMediaApi.entities.User;
+import com.cooksys.socialMediaApi.services.TweetService;
+import com.cooksys.socialMediaApi.services.UserService;
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 
 import com.cooksys.socialMediaApi.dtos.TweetRepostResponseDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
@@ -18,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/tweets")
 public class TweetController {
 
+    private final UserService userService;
     private final TweetService tweetService;
     
     @GetMapping
@@ -28,5 +35,12 @@ public class TweetController {
     @GetMapping("/{id}/reposts")
     public List<TweetResponseDto> getAllReposts(@PathVariable Long id) {
     	return tweetService.getAllReposts(id);
+
+    @PostMapping("/{id}/reply")
+    public TweetResponseDto replyToTweet(@PathVariable Long id, @RequestBody TweetRequestDto tweetRequestDto) {
+        User user = userService.authenticateUser(tweetRequestDto.getCredentials());
+
+        return tweetService.replyToTweet(id, user, tweetRequestDto);
+
     }
 }

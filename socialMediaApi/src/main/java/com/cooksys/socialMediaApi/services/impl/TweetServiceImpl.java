@@ -1,12 +1,15 @@
 package com.cooksys.socialMediaApi.services.impl;
 
+import com.cooksys.socialMediaApi.entities.Hashtag;
+import com.cooksys.socialMediaApi.entities.User;
+import com.cooksys.socialMediaApi.services.HashtagService;
+import com.cooksys.socialMediaApi.services.UserService;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 
-import com.cooksys.socialMediaApi.dtos.TweetRepostResponseDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.entities.Tweet;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
@@ -20,9 +23,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TweetServiceImpl implements TweetService {
 
-	private final TweetRepository tweetRepository;
-	private final TweetMapper tweetMapper;
-
+  private final TweetRepository tweetRepository;
+  private final TweetMapper tweetMapper;
+	private final UserService userService;
+	private final HashtagService hashtagService;
+  
 	private Tweet getTweet(Long id) {
 		Optional<Tweet> optionalTweet = tweetRepository.findByIdAndDeletedFalse(id);
 		if (optionalTweet.isEmpty()) {
@@ -53,5 +58,72 @@ public class TweetServiceImpl implements TweetService {
 		}
 		
 		return tweetResponse;
+	}
+
+
+	/*
+	 * 1. check if tweet to reply to exists and is not deleted, otherwise throw exception
+	 * 2. create a tweet, setting the inReplyTo property to the tweet being replied to and the author to user's credentials
+	 * 3. check the tweet content for hashtags, saving any hashtags necessary and add it to the tweet
+	 * 4. check the tweet content for mentions, adding any mentions to the tweet
+	 * 5. save and return the tweet
+	 */
+	@Override
+	public TweetResponseDto replyToTweet(Long id, User author, TweetRequestDto tweetRequestDto) {
+		Optional<Tweet> optionalTweetToReplyTo = tweetRepository.findByIdAndDeletedFalse(id);
+
+		if (optionalTweetToReplyTo.isEmpty()) {
+			throw new NotFoundException("Tweet to reply to not found");
+		}
+
+		Tweet reply = tweetMapper.requestDtoToEntity(tweetRequestDto);
+		reply.setAuthor(author);
+		reply.setInReplyTo(optionalTweetToReplyTo.get());
+		reply.setHashtags(getHashtags(reply.getContent()));
+		reply.setMentionedUsers(getMentionedUsers(reply.getContent()));
+
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(reply));
+	}
+
+	/**
+	 * Finds hashtags within a given string. The following rules decide which hashtags are valid:
+	 * 1. The word must start with a '#'
+	 * 2. The hashtag ends once a non-word character is encountered (e.g. #Hi!Friend -> #Hi, ##Goals -> #)
+	 * 3. After sanitizing, the hashtag after the '#' prefix must not be empty, otherwise it will be dropped
+	 *
+	 * @param content the raw string contents of the tweet
+	 * @return a list of hashtag entities
+	 */
+	private List<Hashtag> getHashtags(String content) {
+		String sanitizedContent = content.replaceAll("[^#\\w]", " ");
+
+		return Arrays.stream(sanitizedContent.split("\\s+"))
+			.filter(word -> word.startsWith("#") && word.length() > 1)
+			.map(hashtag -> hashtag.substring(1))
+			.map(hashtagService::getTagOrCreateIfNew)
+			.collect(Collectors.toList());
+	}
+
+
+	/**
+	 * Finds mentioned users within a given string. The following rules decide which mentions are valid:
+	 * 1. The word must start with a '@'
+	 * 2. The mention ends once a non-word character is encountered (e.g. @John$Doe -> @John, @@John -> @)
+	 * 3. After sanitizing, the mention after the '@' prefix must not be empty, otherwise it will be dropped
+	 * 4. Users who do not exist or have been deleted are not included in this list
+	 *
+	 * @param content the raw string contents of the tweet
+	 * @return a list of User entities identified without their '#' prefix
+	 */
+	private List<User> getMentionedUsers(String content) {
+		String sanitizedContent = content.replaceAll("[^#\\w]", " ");
+
+		return Arrays.stream(sanitizedContent.split("\\s"))
+			.filter(word -> word.startsWith("@") && word.length() > 1)
+			.map(mention -> mention.substring(1))
+			.filter(userService::userActive)
+			.map(userService::getUserEntityByUsername)
+			.collect(Collectors.toList());
+
 	}
 }
