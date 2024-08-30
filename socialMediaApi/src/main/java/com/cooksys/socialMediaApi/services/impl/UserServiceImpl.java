@@ -165,6 +165,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<UserResponseDto> getFollowers(String username) {
+        if (!userActive(username)) {
+            throw new NotFoundException("User not found");
+        }
+
+        User user = getUserEntityByUsername(username);
+
+        return user.getFollowers().stream()
+            .filter(follower -> !follower.isDeleted())
+            .map(userMapper::entityToDto)
+            .collect(Collectors.toList());
+    }
+
+    @Override
 	public List<UserResponseDto> getFollowingUsers(String username) {
 		Optional<User> optionalUser = userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username);
 
