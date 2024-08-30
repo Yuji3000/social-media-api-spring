@@ -1,7 +1,12 @@
 package com.cooksys.socialMediaApi.services.impl;
 
+import com.cooksys.socialMediaApi.dtos.ContextDto;
+import com.cooksys.socialMediaApi.entities.Hashtag;
+import com.cooksys.socialMediaApi.entities.User;
+import com.cooksys.socialMediaApi.services.HashtagService;
+import com.cooksys.socialMediaApi.services.UserService;
+import java.util.*;
 import java.util.ArrayList;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -13,20 +18,15 @@ import com.cooksys.socialMediaApi.dtos.HashtagResponseDto;
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
-import com.cooksys.socialMediaApi.entities.Hashtag;
 import com.cooksys.socialMediaApi.entities.Tweet;
 import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
-import com.cooksys.socialMediaApi.entities.User;
 import com.cooksys.socialMediaApi.exceptions.BadRequestException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
 import com.cooksys.socialMediaApi.mappers.HashtagMapper;
 import com.cooksys.socialMediaApi.mappers.TweetMapper;
 import com.cooksys.socialMediaApi.mappers.UserMapper;
 import com.cooksys.socialMediaApi.repositories.TweetRepository;
-import com.cooksys.socialMediaApi.repositories.UserRepository;
-import com.cooksys.socialMediaApi.services.HashtagService;
 import com.cooksys.socialMediaApi.services.TweetService;
-import com.cooksys.socialMediaApi.services.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -70,7 +70,7 @@ public class TweetServiceImpl implements TweetService {
 
 		return userMapper.entitiesToDtos(activeUsers);
 	}
-    
+
 	/**
 	 * Gets all hashtags found in a tweet.
 	 *
@@ -148,7 +148,7 @@ public class TweetServiceImpl implements TweetService {
 				.collect(Collectors.toList());
 
 		return userMapper.entitiesToDtos(mentionedUsers);
-	}
+  }
 
     @Override
 	public TweetResponseDto repostTweet(Long id, User author) {
@@ -187,8 +187,8 @@ public class TweetServiceImpl implements TweetService {
 	 * tweet has already been liked. An exception is thrown if the tweet does
 	 * not exist.
 	 *
-	 * @param id
-	 * @param user
+	 * @param id the id of the tweet to like
+	 * @param user the user liking the tweet
 	 */
 	@Override
 	public void likeTweet(Long id, User user) {
@@ -204,7 +204,44 @@ public class TweetServiceImpl implements TweetService {
 			likedTweets.add(tweetToLike);
 		}
 
-		userRepository.saveAndFlush(user);
+		userService.saveUser(user);
+	}
+
+	@Override
+	public ContextDto getTweetContext(Long id) {
+		Tweet tweet = getTweetEntity(id);
+
+		List<Tweet> flattenedReplies = new ArrayList<>();
+		collectFlattenedReplies(tweet, flattenedReplies);
+		flattenedReplies.sort(Comparator.comparing(Tweet::getPosted));
+
+		List<Tweet> tweetsRepliedToChain = new ArrayList<>();
+		collectTweetsRepliedToChain(tweet, tweetsRepliedToChain);
+
+		ContextDto contextDto = new ContextDto();
+		contextDto.setTarget(tweetMapper.entityToDto(tweet));
+		contextDto.setBefore(tweetMapper.entitiesToDtos(tweetsRepliedToChain));
+		contextDto.setAfter(tweetMapper.entitiesToDtos(flattenedReplies));
+
+		return contextDto;
+	}
+
+	private void collectTweetsRepliedToChain(Tweet tweet, List<Tweet> tweetsRepliedToChain) {
+		for (Tweet parentTweet = tweet.getInReplyTo(); parentTweet != null; parentTweet = parentTweet.getInReplyTo()) {
+			if (!parentTweet.isDeleted()) {
+				tweetsRepliedToChain.add(parentTweet);
+			}
+		}
+	}
+
+	private void collectFlattenedReplies(Tweet tweet, List<Tweet> flattenedReplies) {
+		for (Tweet reply : tweet.getReplies()) {
+			if (!reply.isDeleted()) {
+				flattenedReplies.add(reply);
+			}
+
+			collectFlattenedReplies(reply, flattenedReplies);
+		}
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package com.cooksys.socialMediaApi.controllers;
 
 import java.util.List;
 
+import com.cooksys.socialMediaApi.dtos.ContextDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +21,6 @@ import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 import com.cooksys.socialMediaApi.entities.User;
 import com.cooksys.socialMediaApi.services.TweetService;
 import com.cooksys.socialMediaApi.services.UserService;
-
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -50,12 +49,15 @@ public class TweetController {
     @GetMapping("/{id}/mentions")
     public List<UserResponseDto> getTweetMentions(@PathVariable Long id) {
     	return tweetService.getTweetMentions(id);
-    }
+	}
 
     @GetMapping("/{id}/reposts")
     public List<TweetResponseDto> getAllReposts(@PathVariable Long id) {
     	return tweetService.getAllReposts(id);
     }
+
+    @GetMapping("/{id}/context")
+    public ContextDto getTweetContext(@PathVariable Long id) { return tweetService.getTweetContext(id); }
 
     @PostMapping("/{id}/reply")
     public TweetResponseDto replyToTweet(@PathVariable Long id, @RequestBody TweetRequestDto tweetRequestDto) {
@@ -75,28 +77,26 @@ public class TweetController {
     public List<UserResponseDto> getTweetLikes(@PathVariable Long id) {
         return tweetService.getTweetLikes(id);
     }
-  
+
     @GetMapping("/{id}/tags")
     public List<HashtagResponseDto> getTweetTags (@PathVariable Long id) {
         return tweetService.getTweetTags(id);
     }
-    
 
     @DeleteMapping("/{id}")
     public TweetResponseDto deleteTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
     	User user = userService.authenticateUser(credentialsDto);
-    	
+
     	return tweetService.deleteTweet(id, user);
     }
-    
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping("/{id}/like")
     public void likeTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
         User user = userService.authenticateUser(credentialsDto);
+
         tweetService.likeTweet(id, user);
     }
-
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
