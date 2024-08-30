@@ -174,7 +174,10 @@ public class TweetServiceImpl implements TweetService {
 			.map(tweetMapper::entityToDto)
 			.toList();
 
-		replies.forEach(reply -> reply.getInReplyTo().setInReplyTo(null));
+		replies.forEach(reply -> {
+			reply.setInReplyTo(null);
+			reply.setRepostOf(null);
+		});
 
 		return replies;
 	}
