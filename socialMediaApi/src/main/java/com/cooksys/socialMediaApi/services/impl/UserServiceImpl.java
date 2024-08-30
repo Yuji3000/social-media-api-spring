@@ -159,6 +159,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void saveUser(User user) {
+        userRepository.saveAndFlush(user);
+    }
+
+    @Override
     public UserResponseDto deleteUser(String username, CredentialsDto credentialsDto) {
         validateCredentials(credentialsDto);
 

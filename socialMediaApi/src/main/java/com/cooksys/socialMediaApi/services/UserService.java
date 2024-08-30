@@ -20,6 +20,8 @@ public interface UserService {
 
     UserResponseDto createUser(UserRequestDto userRequestDto);
 
+	void saveUser(User user);
+
 	UserResponseDto deleteUser(String username, CredentialsDto credentialsDto);
 
 	List<TweetResponseDto> getTweetsFromUser(String username);
