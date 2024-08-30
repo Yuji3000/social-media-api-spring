@@ -32,6 +32,27 @@ public class UserServiceImpl implements UserService {
 	private final TweetMapper tweetMapper;
 	private final UserRepository userRepository;
 
+    /**
+     * Adds a following relationship between the follower and a user. An
+     * exception is thrown if the relationship already exists.
+     *
+     * @param username The user to be followed.
+     * @param follower The follower.
+     */
+    @Override
+    public void followUser(String username, User follower) {
+        User user = getUserEntityByUsername(username);
+
+        List<User> following = follower.getFollowing();
+        if (!following.contains(user)) {
+            following.add(user);
+        } else {
+            throw new BadRequestException("This user is already followed");
+        }
+
+        userRepository.saveAndFlush(follower);
+    }
+
 	private void validateUserExistsAndActive(String username) {
 		if (userRepository.findByCredentialsIgnoreCaseUsernameAndDeletedFalse(username).isEmpty()) {
 			throw new NotFoundException("User is not found or has been deleted.");
