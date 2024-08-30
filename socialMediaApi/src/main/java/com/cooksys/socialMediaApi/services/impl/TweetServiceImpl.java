@@ -13,12 +13,14 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.cooksys.socialMediaApi.dtos.HashtagResponseDto;
 import com.cooksys.socialMediaApi.dtos.TweetRequestDto;
 import com.cooksys.socialMediaApi.dtos.TweetResponseDto;
 import com.cooksys.socialMediaApi.dtos.UserResponseDto;
 import com.cooksys.socialMediaApi.entities.Tweet;
 import com.cooksys.socialMediaApi.exceptions.BadRequestException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
+import com.cooksys.socialMediaApi.mappers.HashtagMapper;
 import com.cooksys.socialMediaApi.mappers.TweetMapper;
 import com.cooksys.socialMediaApi.mappers.UserMapper;
 import com.cooksys.socialMediaApi.repositories.TweetRepository;
@@ -34,7 +36,8 @@ public class TweetServiceImpl implements TweetService {
 	private final TweetMapper tweetMapper;
 	private final UserService userService;
 	private final HashtagService hashtagService;
-    private final UserMapper userMapper;
+	private final HashtagMapper hashtagMapper;
+	private final UserMapper userMapper;
 
 	private Tweet getTweetEntity(Long id) {
 		Optional<Tweet> optionalTweet = tweetRepository.findByIdAndDeletedFalse(id);
@@ -42,6 +45,19 @@ public class TweetServiceImpl implements TweetService {
 			throw new NotFoundException("No Tweet with id: " + id);
 		}
 		return optionalTweet.get();
+	}
+
+	/**
+	 * Gets all hashtags found in a tweet.
+	 *
+	 * @param id The ID of the tweet.
+	 * @return A list of the tweet's tags.
+	 */
+	@Override
+	public List<HashtagResponseDto> getTweetTags(Long id) {
+		Tweet tweet = getTweetEntity(id);
+
+		return hashtagMapper.entitiesToDtos(tweet.getHashtags());
 	}
 
 	/**
@@ -195,7 +211,7 @@ public class TweetServiceImpl implements TweetService {
 				.stream()
 				.filter(repost -> !repost.isDeleted())
 				.collect(Collectors.toList());
-
+		
 		List<TweetResponseDto> tweetResponse = tweetMapper.entitiesToDtos(filteredTweets);
 		
 		for (TweetResponseDto dto : tweetResponse) {
