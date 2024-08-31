@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.cooksys.socialMediaApi.repositories.TweetRepository;
 import org.springframework.stereotype.Service;
 
 import com.cooksys.socialMediaApi.dtos.CredentialsDto;
@@ -36,6 +37,23 @@ public class UserServiceImpl implements UserService {
 	private final TweetMapper tweetMapper;
     private final CredentialsMapper credentialsMapper;
 	private final UserRepository userRepository;
+    private final TweetRepository tweetRepository;
+
+    /**
+     * Gets all tweets in a user's feed (their tweets + tweets of followed users)
+     * sorted by date. Dates use descending order.
+     *
+     * @param username The user to get the feed for.
+     * @return All tweets in the feed.
+     */
+    @Override
+    public List<TweetResponseDto> getFeed(String username) {
+        User user = getUserEntityByUsername(username);
+
+        List<Tweet> feed = tweetRepository.findByDeletedFalseAndAuthorOrAuthorInOrderByPostedDesc(user, user.getFollowing());
+
+        return tweetMapper.entitiesToDtos(feed);
+    }
 
     /**
      * Adds a following relationship between the follower and a user. An
