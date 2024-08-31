@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
     public List<TweetResponseDto> getFeed(String username) {
         User user = getUserEntityByUsername(username);
 
-        List<Tweet> feed = tweetRepository.getFeedByUserID(user.getId());
+        List<Tweet> feed = tweetRepository.findByDeletedFalseAndAuthorOrAuthorInOrderByPostedDesc(user, user.getFollowing());
 
         return tweetMapper.entitiesToDtos(feed);
     }
