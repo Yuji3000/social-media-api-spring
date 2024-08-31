@@ -106,15 +106,41 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("The credentials must match the user being updated.");
         }
 
-        Profile modifiedProfile = userRequest.getProfile();
+        Profile providedProfile = userRequest.getProfile();
 
-        authenticated.setProfile(modifiedProfile);
+        if (providedProfile == null) {
+            throw new BadRequestException("A profile must be provided");
+        }
+
+        Profile existingProfile = authenticated.getProfile();
+
+        // Only set provided values if not null
+        String firstName = providedProfile.getFirstName();
+        String lastName = providedProfile.getLastName();
+        String email = providedProfile.getEmail();
+        String phone = providedProfile.getPhone();
+        if (firstName != null) {
+            existingProfile.setFirstName(firstName);
+        }
+        if (lastName != null) {
+            existingProfile.setLastName(lastName);
+        }
+        if (email != null) {
+            existingProfile.setEmail(email);
+        }
+        if (phone != null) {
+            existingProfile.setPhone(phone);
+        }
 
         return userMapper.entityToDto(userRepository.saveAndFlush(authenticated));
     }
 
     @Override
     public User authenticateUser(CredentialsDto credentialsDto) {
+        if (credentialsDto == null) {
+            throw new BadRequestException("Credentials must be provided");
+        }
+
         Optional<User> optionalUser = userRepository
             .findByCredentialsIgnoreCaseUsernameAndDeletedFalse(credentialsDto.getUsername());
 
@@ -124,6 +150,9 @@ public class UserServiceImpl implements UserService {
 
         User user = optionalUser.get();
 
+        if (credentialsDto.getPassword() == null || credentialsDto.getUsername() == null) {
+            throw new BadRequestException("Username or password should not be null");
+        }
         if (!credentialsDto.getPassword().equals(user.getCredentials().getPassword())) {
             throw new NotAuthorizedException("Invalid credentials");
         }
