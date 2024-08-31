@@ -300,6 +300,12 @@ public class TweetServiceImpl implements TweetService {
 
 	@Override
 	public TweetResponseDto createTweet(TweetRequestDto tweetRequestDto, User author) {
+		if (tweetRequestDto == null) {
+			throw new BadRequestException("Tweet request must be provided");
+		}
+		if (tweetRequestDto.getContent() == null) {
+			throw new BadRequestException("Tweet content cannot be null");
+		}
 		if (tweetRequestDto.getContent().isEmpty()) {
 			throw new BadRequestException("Tweet content cannot be empty");
 		}
