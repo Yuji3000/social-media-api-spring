@@ -256,7 +256,6 @@ public class TweetServiceImpl implements TweetService {
 
 		for (TweetResponseDto dto : tweetResponse) {
 			dto.setInReplyTo(null);
-			dto.setRepostOf(null);
 		}
 
 		return tweetResponse;
