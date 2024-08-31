@@ -1,8 +1,11 @@
 package com.cooksys.socialMediaApi.services.impl;
 
+import com.cooksys.socialMediaApi.entities.Credentials;
+import com.cooksys.socialMediaApi.entities.Profile;
 import com.cooksys.socialMediaApi.entities.Tweet;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,6 +23,7 @@ import com.cooksys.socialMediaApi.exceptions.NotAuthorizedException;
 import com.cooksys.socialMediaApi.exceptions.NotFoundException;
 import com.cooksys.socialMediaApi.mappers.TweetMapper;
 import com.cooksys.socialMediaApi.mappers.UserMapper;
+import com.cooksys.socialMediaApi.mappers.CredentialsMapper;
 import com.cooksys.socialMediaApi.repositories.UserRepository;
 import com.cooksys.socialMediaApi.services.UserService;
 
@@ -31,6 +35,7 @@ public class UserServiceImpl implements UserService {
 
 	private final UserMapper userMapper;
 	private final TweetMapper tweetMapper;
+    private final CredentialsMapper credentialsMapper;
 	private final UserRepository userRepository;
     private final TweetRepository tweetRepository;
 
@@ -77,7 +82,6 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
-
     private void validateCredentials(CredentialsDto credentialsDto) {
         if (credentialsDto == null || credentialsDto.getUsername() == null || credentialsDto.getPassword() == null
             || credentialsDto.getUsername().isBlank() || credentialsDto.getPassword().isBlank()) {
@@ -100,8 +104,61 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Updates a user's profile. An error is thrown if the credentials do not
+     * match the username.
+     *
+     * @param username The user to be updated
+     * @param userRequestDto The credentials and updated profile
+     * @return Updated user profile
+     */
+    @Override
+    public UserResponseDto updateProfile(String username, UserRequestDto userRequestDto) {
+        User userRequest =  userMapper.requestDtoToEntity(userRequestDto);
+
+        Credentials credentials = userRequest.getCredentials();
+
+        User authenticated = authenticateUser(credentialsMapper.entityToDto(credentials));
+
+        if (!Objects.equals(username, authenticated.getCredentials().getUsername())) {
+            throw new BadRequestException("The credentials must match the user being updated.");
+        }
+
+        Profile providedProfile = userRequest.getProfile();
+
+        if (providedProfile == null) {
+            throw new BadRequestException("A profile must be provided");
+        }
+
+        Profile existingProfile = authenticated.getProfile();
+
+        // Only set provided values if not null
+        String firstName = providedProfile.getFirstName();
+        String lastName = providedProfile.getLastName();
+        String email = providedProfile.getEmail();
+        String phone = providedProfile.getPhone();
+        if (firstName != null) {
+            existingProfile.setFirstName(firstName);
+        }
+        if (lastName != null) {
+            existingProfile.setLastName(lastName);
+        }
+        if (email != null) {
+            existingProfile.setEmail(email);
+        }
+        if (phone != null) {
+            existingProfile.setPhone(phone);
+        }
+
+        return userMapper.entityToDto(userRepository.saveAndFlush(authenticated));
+    }
+
     @Override
     public User authenticateUser(CredentialsDto credentialsDto) {
+        if (credentialsDto == null) {
+            throw new BadRequestException("Credentials must be provided");
+        }
+
         Optional<User> optionalUser = userRepository
             .findByCredentialsIgnoreCaseUsernameAndDeletedFalse(credentialsDto.getUsername());
 
@@ -111,6 +168,9 @@ public class UserServiceImpl implements UserService {
 
         User user = optionalUser.get();
 
+        if (credentialsDto.getPassword() == null || credentialsDto.getUsername() == null) {
+            throw new BadRequestException("Username or password should not be null");
+        }
         if (!credentialsDto.getPassword().equals(user.getCredentials().getPassword())) {
             throw new NotAuthorizedException("Invalid credentials");
         }
@@ -174,6 +234,11 @@ public class UserServiceImpl implements UserService {
 
         User newUser = userMapper.requestDtoToEntity(userRequestDto);
         return userMapper.entityToDto(userRepository.saveAndFlush(newUser));
+    }
+
+    @Override
+    public void saveUser(User user) {
+        userRepository.saveAndFlush(user);
     }
 
     @Override
