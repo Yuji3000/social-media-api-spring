@@ -18,7 +18,7 @@ public class ValidateServiceImpl implements ValidateService {
 
     @Override
     public boolean validateHashtag(String label) {
-        return hashtagRepository.existsByLabel("#" + label);
+        return hashtagRepository.existsByLabel(label);
     }
 
 	@Override
