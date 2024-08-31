@@ -292,9 +292,9 @@ public class UserServiceImpl implements UserService {
 
 		User user = optionalUser.get();
 
-		 List<User> followers = user.getFollowers()
+		 List<User> followers = user.getFollowing()
 		            .stream()
-		            .filter(follower -> !follower.isDeleted())
+		            .filter(userFollowing -> !userFollowing.isDeleted())
 		            .collect(Collectors.toList());
 
 		return userMapper.entitiesToDtos(followers);
