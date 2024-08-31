@@ -34,7 +34,7 @@ public class HashtagServiceImpl implements HashtagService {
 
         if (optionalHashtag.isEmpty()) {
             var newHashTag = new Hashtag();
-            newHashTag.setLabel("#" + label);
+            newHashTag.setLabel(label);
             return hashtagRepository.saveAndFlush(newHashTag);
         }
 
@@ -42,9 +42,9 @@ public class HashtagServiceImpl implements HashtagService {
     }
 
     public List<TweetResponseDto> tweetsByHashtag(String label) throws NotFoundException {
-        if (!hashtagRepository.existsByLabel("#" + label)) { throw new NotFoundException("Hashtag not found :#" + label); }
+        if (!hashtagRepository.existsByLabel(label)) { throw new NotFoundException("Hashtag not found :#" + label); }
 
-        return tweetMapper.entitiesToDtos(tweetRepository.findByDeletedFalseAndHashtagsLabelOrderByPostedDesc("#" + label));
+        return tweetMapper.entitiesToDtos(tweetRepository.findByDeletedFalseAndHashtagsLabelOrderByPostedDesc(label));
     }
 
 }
